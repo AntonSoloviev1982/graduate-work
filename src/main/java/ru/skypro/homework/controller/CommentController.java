@@ -12,7 +12,6 @@ import java.util.List;
 @RequestMapping("/ads/{adId}/comments")
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
-
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
     @GetMapping()
