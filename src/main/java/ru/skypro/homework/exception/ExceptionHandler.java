@@ -12,8 +12,8 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(ValidationException.class)
     public ResponseEntity<?> handlerValidationError(ValidationException e) {
-        logger.error("Переданный в запросе json не валиден, ошибки валидации: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        logger.error("Переданный в запросе json не валиден, ошибки валидации: {}", e.getViolations());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getViolations());
     }
 
 }
