@@ -12,15 +12,9 @@ import ru.skypro.homework.util.ValidationUtils;
 @CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
-    private final ValidationUtils validationUtils;
-
-    public UserController(ValidationUtils validationUtils) {
-        this.validationUtils = validationUtils;
-    }
 
     @PostMapping("/set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPassword) {
-        validationUtils.isValid(newPassword);
         return ResponseEntity.ok().build();
         // нужно создать один маппер
         // необходима проверка на ошибки: 401 и 403
@@ -35,7 +29,6 @@ public class UserController {
 
     @PatchMapping("/me")
     public ResponseEntity<UpdateUserDto> setInfoAboutAuthorizedUser(@RequestBody UpdateUserDto updateUser) {
-        validationUtils.isValid(updateUser);
         return ResponseEntity.ok(new UpdateUserDto());
         // нужно создать два маппера
         // необходима проверка на ошибку 401

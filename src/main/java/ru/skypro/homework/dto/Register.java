@@ -21,7 +21,7 @@ public class Register {
     @NotBlank
     @Size(min = 2, max = 16, message = "Фамилия должна быть в диапозоне от 2 до 16 символов!")
     private String lastName;
-    @Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}",
+    @Pattern(regexp = "\\+7\\(\\d{3}\\)\\d{3}-\\d{2}-\\d{2}",
             message = "Телефон должен соответствовать следующему шаблону: +7(000)000-00-00")
     private String phone;
     @NotNull(message = "Роль пользователя не должна быть пустой!")
