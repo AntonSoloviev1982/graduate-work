@@ -45,7 +45,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -87,7 +86,7 @@
         <configuration>
           <excludes>
             <exclude>
-              <groupId>org.projectlombok</groupId>
+              <groupId>org.project-lombok</groupId>
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
