@@ -1,11 +1,13 @@
 package ru.skypro.homework.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.util.ValidationUtils;
+
 
 @RestController
 @RequestMapping("/users")
@@ -34,8 +36,8 @@ public class UserController {
         // необходима проверка на ошибку 401
     }
 
-    @PatchMapping("/me/image")
-    public ResponseEntity<?> setAvatar(@RequestBody String image) {
+    @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image) {
         return ResponseEntity.ok().build();
         // необходима проверка на ошибку 401
     }
