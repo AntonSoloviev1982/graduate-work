@@ -5,12 +5,12 @@ import ru.skypro.homework.dto.Role;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Table;
 import java.util.List;
 
 @Data
-@Entity(name = "users")  //таблица с именем user не создается
+@Table(name = "`user`")  //таблица с именем user создается, только если имя указать в ``
+@Entity
 public class User {
     @Id
     private Integer id;

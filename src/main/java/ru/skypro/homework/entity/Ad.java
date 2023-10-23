@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Ad {
     @Id
-    int id;
+    private int id;
     @ManyToOne
     private User user;
     private String title;       //4-32
