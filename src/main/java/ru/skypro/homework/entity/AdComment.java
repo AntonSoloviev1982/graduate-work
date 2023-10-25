@@ -11,11 +11,11 @@ public class AdComment {
 
     @ManyToOne
     @JoinColumn(nullable = false , name = "ad_id")
-    private Ad ad;
+    private Integer adId;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "user_id")
-    private User user;
+    private Integer userId;
 
 
 
