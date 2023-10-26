@@ -19,8 +19,13 @@ public class User {
     private String phone;
     private Role role;
     private String image; //ссылка на фото (в базе или в файле)
-    @OneToMany(mappedBy = "users")
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
     private List<Ad> ads;
+
+    public User() {
+    }
 
     public Integer getId() {
         return id;
@@ -68,5 +73,13 @@ public class User {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public List<Ad> getAds() {
+        return ads;
+    }
+
+    public void setAds(List<Ad> ads) {
+        this.ads = ads;
     }
 }

@@ -14,17 +14,17 @@ public class AdComment {
 
     @ManyToOne
     @JoinColumn(nullable = false , name = "ad_id")
-    private Integer adId;
+    private Ad ad;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "user_id")
-    private Integer userId;
+    private User user;
 
-    public AdComment(String text, Integer adId, Integer userId) {
+    public AdComment(String text, Ad ad, User user) {
         this.text = text;
         this.createdAt = LocalDateTime.now();
-        this.adId = adId;
-        this.userId = userId;
+        this.ad = ad;
+        this.user = user;
     }
 
     public AdComment() {
@@ -42,12 +42,12 @@ public class AdComment {
         return text;
     }
 
-    public Integer getAdId() {
-        return adId;
+    public Ad getAd() {
+        return ad;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
     public void setId(Integer id) {
@@ -62,12 +62,11 @@ public class AdComment {
         this.createdAt = createdAt;
     }
 
-    public void setAdId(Integer adId) {
-        this.adId = adId;
+    public void setAd(Ad ad) {
+        this.ad = ad;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
-
 }

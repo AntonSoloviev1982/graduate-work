@@ -22,6 +22,9 @@ public class Ad {
     @OneToMany(mappedBy = "ad")
     private List<AdComment> adCommentList;
 
+    public Ad() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -69,4 +72,13 @@ public class Ad {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public List<AdComment> getAdCommentList() {
+        return adCommentList;
+    }
+
+    public void setAdCommentList(List<AdComment> adCommentList) {
+        this.adCommentList = adCommentList;
+    }
+
 }
