@@ -1,8 +1,11 @@
 package ru.skypro.homework.entity;
 
+import lombok.Getter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "comments")
 public class AdComment {
@@ -28,26 +31,6 @@ public class AdComment {
     }
 
     public AdComment() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Ad getAd() {
-        return ad;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public void setId(Integer id) {

@@ -1,12 +1,14 @@
 package ru.skypro.homework.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
 import java.util.List;
 
 
+@Data
 @Entity
 @Table(name = "users")  //таблица с именем user создается, только если имя указать в ``
 public class User {
@@ -24,62 +26,4 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Ad> ads;
 
-    public User() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public List<Ad> getAds() {
-        return ads;
-    }
-
-    public void setAds(List<Ad> ads) {
-        this.ads = ads;
-    }
 }

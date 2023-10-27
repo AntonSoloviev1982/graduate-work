@@ -14,8 +14,8 @@ CREATE TABLE users
 );
 
 --changeset alexander:create_ad
-DROP TABLE IF EXISTS ad;
-CREATE TABLE ad
+DROP TABLE IF EXISTS ads;
+CREATE TABLE ads
 (
     id             INTEGER   PRIMARY KEY AUTO_INCREMENT,
     user_id        INTEGER   NOT NULL,
@@ -35,6 +35,6 @@ CREATE TABLE comments
     created_at     TIMESTAMP   NOT NULL,
     ad_id          INTEGER   NOT NULL,
     user_id        INTEGER   NOT NULL,
-    FOREIGN KEY (ad_id) REFERENCES ad (id),
+    FOREIGN KEY (ad_id) REFERENCES ads (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
