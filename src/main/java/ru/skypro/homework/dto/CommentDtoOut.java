@@ -1,6 +1,9 @@
 package ru.skypro.homework.dto;
 
-public class Comment {
+import lombok.Getter;
+
+@Getter
+public class CommentDtoOut {
 
     private Integer author;
 
@@ -14,7 +17,7 @@ public class Comment {
 
     private String text;
 
-    public Comment(Integer author, String authorImage, String authorFirstName, Long createdAt, Integer pk, String text) {
+    public CommentDtoOut(Integer author, String authorImage, String authorFirstName, Long createdAt, Integer pk, String text) {
         this.author = author;
         this.authorImage = authorImage;
         this.authorFirstName = authorFirstName;
@@ -23,31 +26,7 @@ public class Comment {
         this.text = text;
     }
 
-    public Comment() {
-    }
-
-    public Integer getAuthor() {
-        return author;
-    }
-
-    public String getAuthorImage() {
-        return authorImage;
-    }
-
-    public String getAuthorFirstName() {
-        return authorFirstName;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Integer getPk() {
-        return pk;
-    }
-
-    public String getText() {
-        return text;
+    public CommentDtoOut() {
     }
 
     public void setAuthor(Integer author) {

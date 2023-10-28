@@ -1,6 +1,5 @@
 package ru.skypro.homework.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import ru.skypro.homework.dto.Role;
 
@@ -22,7 +21,6 @@ public class User {
     private Role role;
     private String image; //ссылка на фото (в базе или в файле)
 
-    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Ad> ads;
 
