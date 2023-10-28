@@ -7,6 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.service.UserService;
+
+import java.security.Principal;
 
 
 @RestController
@@ -14,35 +17,41 @@ import ru.skypro.homework.dto.UserDto;
 @CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPassword) {
+    public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPasswordDto,
+                                         Principal principal) {
+        userService.setPassword(newPasswordDto, principal);
         return ResponseEntity.ok().build();
-        // нужно создать один маппер
-        // необходима проверка на ошибки: 401 и 403
+        // необходима проверка на ошибку 401
+        // необходима проверка на ошибку 403
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getInfoAboutAuthorizedUser() {
-        return ResponseEntity.ok(new UserDto());
-        // нужно создать один маппер
+    public ResponseEntity<UserDto> getInfoAboutAuthorizedUser(Principal principal) {
+        return ResponseEntity.ok().body(userService.getInfoAboutAuthorizedUser(principal));
         // необходима проверка на ошибку 401
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UpdateUserDto> setInfoAboutAuthorizedUser(@RequestBody UpdateUserDto updateUser) {
-        return ResponseEntity.ok(new UpdateUserDto());
-        // нужно создать два маппера
+    public ResponseEntity<UpdateUserDto> setInfoAboutAuthorizedUser(@RequestBody UpdateUserDto updateUserDto,
+                                                                    Principal principal) {
+        return ResponseEntity.ok().body(userService.setInfoAboutAuthorizedUser(updateUserDto, principal));
         // необходима проверка на ошибку 401
     }
 
     @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image) {
+    public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image,
+                                       Principal principal) {
+        userService.setAvatar(image, principal);
         return ResponseEntity.ok().build();
         // необходима проверка на ошибку 401
     }
-
-
 
 
 }

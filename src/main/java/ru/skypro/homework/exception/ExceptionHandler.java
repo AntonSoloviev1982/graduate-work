@@ -23,4 +23,16 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handlerUserNotFound(UserNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(PasswordsNotEqualsException.class)
+    public ResponseEntity<?> handlerPasswordsNotEquals(PasswordsNotEqualsException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 }

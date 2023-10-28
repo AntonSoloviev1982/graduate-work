@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 public class UserDto {
 
     private Integer id;
-    private String userName;
+    private String email;
     private String firstName;
     private String lastName;
     private String phone;
