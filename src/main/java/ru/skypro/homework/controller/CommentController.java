@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.skypro.homework.dto.Comment;
+import ru.skypro.homework.dto.CommentDtoOut;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 
@@ -22,19 +22,23 @@ public class CommentController {
     }
 
     @PostMapping()
-    public ResponseEntity<Comment> addComment(@PathVariable Integer adId, @RequestBody CreateOrUpdateComment comment){
+    public ResponseEntity<CommentDtoOut> addComment(@PathVariable Integer adId,
+                                                    @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment creation method is called.");
-        return ResponseEntity.ok(new Comment());
+        return ResponseEntity.ok(new CommentDtoOut());
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Integer adId, @PathVariable Integer commentId,@RequestBody CreateOrUpdateComment comment){
+    public ResponseEntity<CommentDtoOut> updateComment(@PathVariable Integer adId,
+                                                       @PathVariable Integer commentId,
+                                                       @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment update method is called.");
-        return ResponseEntity.ok(new Comment());
+        return ResponseEntity.ok(new CommentDtoOut());
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId){
+    public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
+                                           @PathVariable Integer commentId){
         logger.info("The comment delete method is called.");
         return ResponseEntity.ok(HttpStatus.OK);
     }
