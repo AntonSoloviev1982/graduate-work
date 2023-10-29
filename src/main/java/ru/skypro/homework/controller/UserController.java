@@ -10,39 +10,35 @@ import ru.skypro.homework.dto.UserDto;
 
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("users")
 @CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
 
-    @PostMapping("/set_password")
+    @PostMapping("set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPassword) {
         return ResponseEntity.ok().build();
         // нужно создать один маппер
         // необходима проверка на ошибки: 401 и 403
     }
 
-    @GetMapping("/me")
+    @GetMapping("me")
     public ResponseEntity<UserDto> getInfoAboutAuthorizedUser() {
         return ResponseEntity.ok(new UserDto());
         // нужно создать один маппер
         // необходима проверка на ошибку 401
     }
 
-    @PatchMapping("/me")
+    @PatchMapping("me")
     public ResponseEntity<UpdateUserDto> setInfoAboutAuthorizedUser(@RequestBody UpdateUserDto updateUser) {
         return ResponseEntity.ok(new UpdateUserDto());
         // нужно создать два маппера
         // необходима проверка на ошибку 401
     }
 
-    @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(path = "me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image) {
         return ResponseEntity.ok().build();
         // необходима проверка на ошибку 401
     }
-
-
-
-
 }

@@ -1,40 +1,53 @@
 -- liquibase formatted sql
 
---changeset alexander:create_users
-DROP TABLE IF EXISTS users;
-CREATE TABLE users
+--changeset alexander:create_user
+DROP TABLE IF EXISTS public.user;
+CREATE TABLE public.user
 (
-    id             INTEGER   PRIMARY KEY AUTO_INCREMENT,
-    user_name      TEXT      NOT NULL,
-    first_name     TEXT      NOT NULL,
-    last_name      TEXT,
-    phone          TEXT      NOT NULL,
-    role           BOOLEAN   NOT NULL,
-    image          TEXT,
+    id             SERIAL PRIMARY KEY,
+    user_name      VARCHAR(32)     NOT NULL,
+    first_name     VARCHAR(16)     NOT NULL,
+    last_name      VARCHAR(16),
+    phone          VARCHAR(16),
+    role           INTEGER         NOT NULL,
+    image          VARCHAR(40)
 );
 
 --changeset alexander:create_ad
-DROP TABLE IF EXISTS ads;
-CREATE TABLE ads
+DROP TABLE IF EXISTS ad;
+CREATE TABLE ad
 (
-    id             INTEGER   PRIMARY KEY AUTO_INCREMENT,
-    user_id        INTEGER   NOT NULL,
-    title          TEXT      NOT NULL,
-    price          INTEGER   NOT NULL,
-    description    TEXT      NOT NULL,
-    image          TEXT,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    id             SERIAL PRIMARY KEY,
+    user_id        INTEGER         NOT NULL,
+    title          VARCHAR(32)     NOT NULL,
+    price          INTEGER         NOT NULL,
+    description    VARCHAR(64)     NOT NULL,
+    image          VARCHAR(40),
+    FOREIGN KEY (user_id) REFERENCES public.user (id)
 );
 
---changeset alexander:create_comments
-DROP TABLE IF EXISTS comments;
-CREATE TABLE comments
+--changeset alexander:create_comment
+DROP TABLE IF EXISTS comment;
+CREATE TABLE comment
 (
-    id             INTEGER   PRIMARY KEY AUTO_INCREMENT,
-    text           TEXT      NOT NULL,
-    created_at     TIMESTAMP   NOT NULL,
-    ad_id          INTEGER   NOT NULL,
-    user_id        INTEGER   NOT NULL,
-    FOREIGN KEY (ad_id) REFERENCES ads (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    id             SERIAL PRIMARY KEY,
+    text           VARCHAR(64)      NOT NULL,
+    created_at     TIMESTAMP        NOT NULL,
+    ad_id          INTEGER          NOT NULL,
+    user_id        INTEGER          NOT NULL,
+    FOREIGN KEY (ad_id) REFERENCES ad (id),
+    FOREIGN KEY (user_id) REFERENCES public.user (id)
+);
+
+--changeset pavel:create_image
+DROP TABLE IF EXISTS image;
+CREATE TABLE image
+(
+    id             SERIAL PRIMARY KEY,
+    image          BLOB NOT NULL,
+    created_at     TIMESTAMP        NOT NULL,
+    ad_id          INTEGER          NOT NULL,
+    user_id        INTEGER          NOT NULL,
+    FOREIGN KEY (ad_id) REFERENCES ad (id),
+    FOREIGN KEY (user_id) REFERENCES public.user (id)
 );

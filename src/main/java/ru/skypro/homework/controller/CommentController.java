@@ -10,7 +10,7 @@ import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 
 @RestController
-@RequestMapping("/ads/{adId}/comments")
+@RequestMapping("ads/{adId}/comments")
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
@@ -28,7 +28,7 @@ public class CommentController {
         return ResponseEntity.ok(new CommentDtoOut());
     }
 
-    @PatchMapping("/{commentId}")
+    @PatchMapping("{commentId}")
     public ResponseEntity<CommentDtoOut> updateComment(@PathVariable Integer adId,
                                                        @PathVariable Integer commentId,
                                                        @RequestBody CreateOrUpdateComment comment){
@@ -36,7 +36,7 @@ public class CommentController {
         return ResponseEntity.ok(new CommentDtoOut());
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
                                            @PathVariable Integer commentId){
         logger.info("The comment delete method is called.");

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")  //таблица с именем user создается, только если имя указать в ``
+@Table(name = "`user`")  //таблица с именем user создается, только если имя указать в ``
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
