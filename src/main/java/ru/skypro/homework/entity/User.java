@@ -25,15 +25,11 @@ public class User {
 
     private String phone;
 
-    @Enumerated(EnumType.STRING)
+    //можно не писать @Enumerated(EnumType.ORDINAL)
     private Role role;
 
     private String image; //ссылка на фото (в базе или в файле)
 
     @OneToMany(mappedBy = "user")
     private List<Ad> ads;
-
-    // Свзяь One-to-many на комментарии
-
-
 }

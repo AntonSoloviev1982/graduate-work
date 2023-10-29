@@ -3,11 +3,14 @@ package ru.skypro.homework.mapper;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.CommentDtoOut;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.UserRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.ZoneOffset;
 
 @Component
@@ -21,6 +24,14 @@ public class CommentMapper {
         this.adRepository = adRepository;
     }
 
+    //К Диме. Не вижу, где может пригодиться этот метод (toEntity)
+    //Для создания и обновления комментария надо будет передать в методы сервиса
+    //объект createOrUpdateComment, пришедший в контроллер,
+    //а сущности Ad и User создать без обращения к базе, т.е. они будут неполноценные.
+    //Ad ad = adRepository.getReferenceById(adId);
+
+    //А кому может потребоваться созданная таким образом сущность? (с обращением к базе)
+    //Да еще зачем-то писать отдельный метод для ее создания.
     public Comment toEntity(CreateOrUpdateComment createOrUpdateComment, Integer adId, Integer userId){
         Comment comment = new Comment();
         comment.setText(createOrUpdateComment.getText());
