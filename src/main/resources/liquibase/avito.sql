@@ -1,18 +1,21 @@
 -- liquibase formatted sql
-
 --changeset alexander:create_user
 DROP TABLE IF EXISTS public.user;
 CREATE TABLE public.user
 (
     id             SERIAL PRIMARY KEY,
-    user_name      VARCHAR(32)     NOT NULL,
+    username       VARCHAR(32)     NOT NULL UNIQUE,
+    password       VARCHAR(16)     NOT NULL,
     first_name     VARCHAR(16)     NOT NULL,
     last_name      VARCHAR(16),
     phone          VARCHAR(16),
     role           INTEGER         NOT NULL,
     image          VARCHAR(40)
 );
-
+INSERT INTO users(id, username, password, first_name, last_name, phone, role, image)
+VALUES (1, 'user@gmail.com', '$2a$12$XvqqmuYW/nXxUmLZvpl1AuJEDJO96BWfKLDlFkYNiQdiTXQEJ5CQC',
+        'Ivan', 'Ivanov', '+7956-456-78-12', 'USER', null);
+        
 --changeset alexander:create_ad
 DROP TABLE IF EXISTS ad;
 CREATE TABLE ad
