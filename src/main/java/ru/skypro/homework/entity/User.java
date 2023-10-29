@@ -6,9 +6,10 @@ import ru.skypro.homework.dto.Role;
 import javax.persistence.*;
 import java.util.List;
 
+
 @Data
-@Table(name = "users")
 @Entity
+@Table(name = "`user`")  //таблица с именем user создается, только если имя указать в ``
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
