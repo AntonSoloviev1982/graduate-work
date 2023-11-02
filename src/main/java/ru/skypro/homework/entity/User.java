@@ -25,7 +25,7 @@ public class User {
 
     private String phone;
 
-    //можно не писать @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.ORDINAL)
     private Role role;
 
     private String image; //ссылка на фото (в базе или в файле)
