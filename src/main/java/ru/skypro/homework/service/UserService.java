@@ -1,5 +1,6 @@
 package ru.skypro.homework.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,26 +17,13 @@ import ru.skypro.homework.repository.UserRepository;
 import java.security.Principal;
 
 @Service
+@RequiredArgsConstructor
 public class UserService  {
 
-    private UserRepository userRepository;
-    private PasswordEncoder encoder;
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setEncoder(PasswordEncoder encoder) {
-        this.encoder = encoder;
-    }
-
-    @Autowired
-    public void setUserMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
 
 
     public void setPassword(NewPasswordDto newPasswordDto, Principal principal) {
@@ -71,7 +59,7 @@ public class UserService  {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        user.setImage(image.getOriginalFilename());                       // жду 4 урока для уточнения
+        user.setImage(image.getOriginalFilename());                       // жду 5 урока для уточнения
         userRepository.save(user);
     }
 
