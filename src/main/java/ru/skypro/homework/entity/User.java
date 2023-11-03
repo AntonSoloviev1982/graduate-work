@@ -25,7 +25,7 @@ public class User {
 
     private String phone;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)  //не ORDINAL - чтобы при смене порядка элементов, не поменялись права
     private Role role;
 
     private String image; //ссылка на фото (в базе или в файле)

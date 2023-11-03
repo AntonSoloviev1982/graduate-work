@@ -1,8 +1,9 @@
 package ru.skypro.homework.service;
 
-import liquibase.pro.packaged.R;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.AdDtoIn;
+import ru.skypro.homework.dto.AdDtoOut;
 import ru.skypro.homework.dto.AdExtendedDtoOut;
 import ru.skypro.homework.dto.AdsDtoOut;
 import ru.skypro.homework.entity.Ad;
@@ -40,7 +41,7 @@ public class AdService {
 
     public AdsDtoOut getMyAds() {
         //пока не знаю, как получить User или userId
-        //Если был User, то можно взять у него объявления без обращения к репозиторию
+        //Если бы был User, то можно взять у него объявления без обращения к репозиторию
         return adMapper.toAdsDtoOut(
                 adRepository.findAllByUserId(1)  //эта часть временная
                         .stream().map(adMapper::toAdDtoOut).collect(Collectors.toList()));
@@ -57,5 +58,27 @@ public class AdService {
 
     public AdExtendedDtoOut getAdById(int id) {
         return adMapper.toAdExtendedDtoOut(adRepository.findById(id).orElseThrow(excSuppl(id)));
+    }
+
+    public AdDtoOut createAd(AdDtoIn adDtoIn, MultipartFile image) {
+        Ad ad = adMapper.toEntity(adDtoIn);
+        try {
+            ad.setImage(image.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return adMapper.toAdDtoOut(adRepository.save(ad));
+    }
+
+    public AdDtoOut updateAd(int id, AdDtoIn adDtoIn) {
+        Ad ad = adRepository.findById(id).orElseThrow(excSuppl(id));
+        ad.setTitle(adDtoIn.getTitle());
+        ad.setPrice(adDtoIn.getPrice());
+        ad.setDescription(adDtoIn.getDescription());
+        return adMapper.toAdDtoOut(adRepository.save(ad));
+    }
+
+    public void deleteAd(int id) {
+        adRepository.deleteById(id);
     }
 }
