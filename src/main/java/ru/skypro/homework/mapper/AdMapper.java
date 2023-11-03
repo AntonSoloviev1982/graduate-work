@@ -12,11 +12,8 @@ import java.util.List;
 
 @Component
 public class AdMapper {
-
-    //К Диме. Не вижу целесообразности в создании специального метода для преобразовании AdDtoIn в Ad
-    //Этот метод может потребоваться только один раз - при создании нового объявления
-    //и его текст может быть частью метода сервиса createAd.
-    //Обращаться к базе и вытягивать комментарии не стал - не знаю, для чего они.
+    //Можно было бы AdDtoIn использовать, передав в сервис, для заполнения полей при сохранении,
+    //но мы превращаем AdDtoIn в Ad здесь, чтобы "отделить логику маппинга от логики сохранения"
     public Ad toEntity(AdDtoIn adDtoIn) {
         Ad ad = new Ad();
         User user = new User(); //пока не рассказали, как добыть текущего пользователя
@@ -33,9 +30,9 @@ public class AdMapper {
         adDtoOut.setAuthor(ad.getUser().getId());
         adDtoOut.setTitle(ad.getTitle());
         adDtoOut.setPrice(ad.getPrice());
-        //Вариант когда картинка лежит вместе с объявлением
-        adDtoOut.setImage("http://localhost:8080/ads/"+ad.getId()+"/image");
-                           //http://localhost:8080/ads/5/image
+        //http://localhost:8080/ads/5/image
+        adDtoOut.setImage("/ads/"+ad.getId()+"/image"); //http://localhost:8080/ - не указываем
+
         return adDtoOut;
     }
     public AdExtendedDtoOut toAdExtendedDtoOut(Ad ad) {
@@ -48,7 +45,7 @@ public class AdMapper {
         adExtendedDtoOut.setTitle(ad.getTitle());
         adExtendedDtoOut.setPrice(ad.getPrice());
         adExtendedDtoOut.setDescription(ad.getDescription());
-        adExtendedDtoOut.setImage("http://localhost:8080/ads/"+ad.getId()+"/image");
+        adExtendedDtoOut.setImage("/ads/"+ad.getId()+"/image");
         return adExtendedDtoOut;
     }
     public AdsDtoOut toAdsDtoOut(List<AdDtoOut> list) {

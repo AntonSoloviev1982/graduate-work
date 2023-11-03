@@ -1,12 +1,7 @@
 package ru.skypro.homework.controller;
 
-//import org.hibernate.Hibernate;
-//import org.hibernate.Session;
-//import org.hibernate.SessionFactory;
-//import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +12,6 @@ import ru.skypro.homework.dto.AdExtendedDtoOut;
 import ru.skypro.homework.dto.AdsDtoOut;
 import ru.skypro.homework.dto.AdDtoOut;
 import ru.skypro.homework.service.AdService;
-//import java.sql.Blob;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
@@ -43,8 +37,7 @@ public class AdController {
                           //А в Postman надо, используя 3 точки, открыть колонку ТипКонтента и задать там application/json
                           @RequestPart MultipartFile image ) {
         LOGGER.info("Получен запрос для addAd: properties = " + adDtoIn + ", image = " + image);
-        //adServis.createAd(adDtoIn, image);
-        return new AdDtoOut();
+        return  adService.createAd(adDtoIn, image);
     }
     @GetMapping("{id}")
     public AdExtendedDtoOut getAdExtended(@PathVariable int id) {
@@ -54,12 +47,13 @@ public class AdController {
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteAd(@PathVariable int id) {
         LOGGER.info("Получен запрос для deleteAd: id = " + id);
+        adService.deleteAd(id);
         return ResponseEntity.ok().build();
     }
     @PatchMapping("{id}")
     public AdDtoOut updateAd(@PathVariable int id, @RequestBody AdDtoIn adDtoIn) {
         LOGGER.info("Получен запрос для updateAd: id = " + id +", adDtoIn = " + adDtoIn);
-        return new AdDtoOut();
+        return adService.updateAd(id, adDtoIn);
     }
     @GetMapping("me")
     public AdsDtoOut getMyAds() {
@@ -69,25 +63,18 @@ public class AdController {
     @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateImage(@PathVariable int id, @RequestPart MultipartFile image) {
         LOGGER.info("Получен запрос для updateImage:  id = " + id + ", image = " + image);
-        /* В задании написано, что возвращать нужно
-        application/octet-stream:
-            schema:
-                type: array
-                items:
-                    type: string
-                    format: byte
-         читается - как массив строк.
-         Дима, можно ничего не возвращать? или что за массив?
-         */
         adService.updateImage(id, image);
     }
     @GetMapping(value = "{id}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable int id) {
         LOGGER.info("Получен запрос для getImage:  id = " + id);
         byte[] photo = adService.getImage(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        headers.setContentLength(photo.length);
-
-        return new ResponseEntity<>(photo, headers, HttpStatus.OK);   }
+        //Фронт без заголовка ответа работает,
+        //но сваггер перестает показывать фото и предлагает скачать файл неизвестного назначения
+        //HttpHeaders headers = new HttpHeaders();
+        //headers.setContentType(MediaType.IMAGE_JPEG);
+        //headers.setContentLength(photo.length);
+        //return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+        return new ResponseEntity<>(photo, HttpStatus.OK);
+    }
 }

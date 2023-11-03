@@ -1,17 +1,15 @@
 package ru.skypro.homework.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.skypro.homework.dto.CommentDtoOut;
-import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.UserRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Component
 public class CommentMapper {
@@ -51,5 +49,10 @@ public class CommentMapper {
         commentDtoOut.setText(comment.getText());
         return commentDtoOut;
     }
-
+    public Comments toComments(List<CommentDtoOut> list) {
+        Comments comments = new Comments();
+        comments.setCount(list.size());
+        comments.setResults(list);
+        return comments;
+    }
 }

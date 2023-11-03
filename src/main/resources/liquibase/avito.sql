@@ -11,12 +11,12 @@ CREATE TABLE public.user
     first_name     VARCHAR(16)     NOT NULL,
     last_name      VARCHAR(16),
     phone          VARCHAR(16),
-    role           INTEGER         NOT NULL,
+    role           VARCHAR(16)        NOT NULL,
     image          VARCHAR(40)
 );
 INSERT INTO public.user(id, username, password, first_name, last_name, phone, role, image)
 VALUES (1, 'user@gmail.com', '$2a$12$XvqqmuYW/nXxUmLZvpl1AuJEDJO96BWfKLDlFkYNiQdiTXQEJ5CQC',
-        'Ivan', 'Ivanov', '+7956-456-78-12', 1, null);
+        'Ivan', 'Ivanov', '+7956-456-78-12', 'ADMIN', null);
         
 --changeset alexander:create_ad
 CREATE TABLE ad
