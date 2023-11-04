@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentDtoOut;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.CommentService;
 
+import java.security.Principal;
 import java.util.Collections;
 
 @RestController
@@ -17,23 +19,26 @@ import java.util.Collections;
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
-    CommentMapper mapper;
 
-    public CommentController(CommentMapper mapper) {
-        this.mapper = mapper;
+    private final CommentService commentService;
+    private final Principal principal;
+
+    public CommentController(CommentService commentService, Principal principal) {
+        this.commentService = commentService;
+        this.principal = principal;
     }
 
     @GetMapping()
     public ResponseEntity<Comments> getComments(@PathVariable Integer adId){
         logger.info("The get all ad comments method is called.");
-        return ResponseEntity.ok(mapper.toComments(Collections.EMPTY_LIST));
+        return ResponseEntity.ok(commentService.findComments(adId));
     }
 
     @PostMapping()
     public ResponseEntity<CommentDtoOut> addComment(@PathVariable Integer adId,
                                                     @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment creation method is called.");
-        return ResponseEntity.ok(new CommentDtoOut());
+        return ResponseEntity.ok(commentService.createComment(adId, comment, principal.getName()));
     }
 
     @PatchMapping("{commentId}")
