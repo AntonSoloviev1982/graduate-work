@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.RequestScope;
 import ru.skypro.homework.dto.CommentDtoOut;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
@@ -14,7 +13,6 @@ import ru.skypro.homework.service.CommentService;
 import java.security.Principal;
 
 @RestController
-@RequestScope
 @RequestMapping("ads/{adId}/comments")
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
