@@ -13,6 +13,8 @@ import ru.skypro.homework.dto.AdsDtoOut;
 import ru.skypro.homework.dto.AdDtoOut;
 import ru.skypro.homework.service.AdService;
 
+import java.security.Principal;
+
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("ads")
@@ -32,12 +34,13 @@ public class AdController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)  //MULTIPART_FORM_DATA_VALUE, иначе сваггер предложит заполнить json
     public AdDtoOut createAd(@RequestPart("properties") AdDtoIn adDtoIn,
-                          //если первый параметр - объект типа AdDtoIn,
-                          //то Swagger не справится в такой посылкой, он пошлет строку.
-                          //А в Postman надо, используя 3 точки, открыть колонку ТипКонтента и задать там application/json
-                          @RequestPart MultipartFile image ) {
+                             //если первый параметр - объект типа AdDtoIn,
+                             //то Swagger не справится в такой посылкой, он пошлет строку.
+                             //А в Postman надо, используя 3 точки, открыть колонку ТипКонтента и задать там application/json
+                             @RequestPart MultipartFile image,
+                             Principal principal) {
         LOGGER.info("Получен запрос для addAd: properties = " + adDtoIn + ", image = " + image);
-        return  adService.createAd(adDtoIn, image);
+        return  adService.createAd(adDtoIn, image, principal);
     }
     @GetMapping("{id}")
     public AdExtendedDtoOut getAdExtended(@PathVariable int id) {
@@ -56,9 +59,9 @@ public class AdController {
         return adService.updateAd(id, adDtoIn);
     }
     @GetMapping("me")
-    public AdsDtoOut getMyAds() {
+    public AdsDtoOut getMyAds(Principal principal) {
         LOGGER.info("Получен запрос для getMyAds");
-        return adService.getMyAds();
+        return adService.getMyAds(principal);
     }
     @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateImage(@PathVariable int id, @RequestPart MultipartFile image) {

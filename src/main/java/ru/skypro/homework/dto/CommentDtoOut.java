@@ -7,6 +7,7 @@ public class CommentDtoOut {
 
     private Integer author;
 
+
     private String authorImage;
 
     private String authorFirstName;

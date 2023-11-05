@@ -1,7 +1,6 @@
 package ru.skypro.homework.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +13,9 @@ import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.Principal;
 
 @Service
@@ -59,9 +61,32 @@ public class UserService  {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        user.setImage(image.getOriginalFilename());                       // жду 5 урока для уточнения
+        try {
+            String uploadDir = "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images";
+            String fileName = image.getOriginalFilename();
+            String filePath = uploadDir + "/" + fileName;
+            user.setImage(filePath);
+            FileOutputStream fos = new FileOutputStream(filePath);
+            fos.write(image.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         userRepository.save(user);
     }
 
+    public byte[] getAvatar(Principal principal) {
+        String username = principal.getName();
+        String filePath = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username)).getImage();
+        try {
+            FileInputStream fis = new FileInputStream(filePath);
+            byte[] imageBytes = fis.readAllBytes();
+            fis.close();
+            return imageBytes;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
 }

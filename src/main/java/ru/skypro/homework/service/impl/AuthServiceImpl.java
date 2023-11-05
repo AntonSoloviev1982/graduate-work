@@ -13,8 +13,6 @@ import ru.skypro.homework.service.UserServiceConfig;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-//    private final UserDetailsManager manager;
-
     private final UserServiceConfig userServiceConfig;
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
@@ -25,7 +23,6 @@ public class AuthServiceImpl implements AuthService {
                            UserRepository userRepository,
                            UserMapper userMapper) {
         this.userServiceConfig = userServiceConfig;
-//        this.manager = manager;
         this.encoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -47,13 +44,6 @@ public class AuthServiceImpl implements AuthService {
         }
         register.setPassword(encoder.encode(register.getPassword()));
         userRepository.save(userMapper.registerToUser(register));
-//        manager.createUser(
-//                User.builder()
-//                        .passwordEncoder(this.encoder::encode)
-//                        .password(register.getPassword())
-//                        .username(register.getUsername())
-//                        .roles(register.getRole().name())
-//                        .build());
         return true;
     }
 
