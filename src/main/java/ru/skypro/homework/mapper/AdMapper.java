@@ -1,5 +1,6 @@
 package ru.skypro.homework.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.AdDtoIn;
 import ru.skypro.homework.dto.AdDtoOut;
@@ -7,17 +8,27 @@ import ru.skypro.homework.dto.AdExtendedDtoOut;
 import ru.skypro.homework.dto.AdsDtoOut;
 import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.UserNotFoundException;
+import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.UserService;
 
+import java.security.Principal;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class AdMapper {
     //Можно было бы AdDtoIn использовать, передав в сервис, для заполнения полей при сохранении,
     //но мы превращаем AdDtoIn в Ad здесь, чтобы "отделить логику маппинга от логики сохранения"
-    public Ad toEntity(AdDtoIn adDtoIn) {
+
+    private final UserRepository userRepository;
+
+    public Ad toEntity(AdDtoIn adDtoIn, Principal principal) {
         Ad ad = new Ad();
-        User user = new User(); //пока не рассказали, как добыть текущего пользователя
-        user.setId(1);
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+//        user.setId(1);
         ad.setUser(user);
         ad.setTitle(adDtoIn.getTitle());
         ad.setPrice(adDtoIn.getPrice());

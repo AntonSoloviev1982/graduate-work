@@ -1,5 +1,9 @@
 package ru.skypro.homework.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,8 @@ public class UserController {
 
     private final UserService userService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -27,30 +33,41 @@ public class UserController {
     @PostMapping("set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPasswordDto,
                                          Principal principal) {
+        LOGGER.info(String.format("Получен запрос для setPassword: newPasswordDto = %s, " +
+                "user = %s", newPasswordDto, principal.getName()));
         userService.setPassword(newPasswordDto, principal);
         return ResponseEntity.ok().build();
-        // необходима проверка на ошибку 401
-        // необходима проверка на ошибку 403
     }
 
     @GetMapping("me")
     public ResponseEntity<UserDto> getInfoAboutAuthorizedUser(Principal principal) {
+        LOGGER.info(String.format("Получен запрос для getInfoAboutAuthorizedUser: user = %s", principal.getName()));
         return ResponseEntity.ok().body(userService.getInfoAboutAuthorizedUser(principal));
-        // необходима проверка на ошибку 401
     }
 
     @PatchMapping("me")
     public ResponseEntity<UpdateUserDto> setInfoAboutAuthorizedUser(@RequestBody UpdateUserDto updateUserDto,
                                                                     Principal principal) {
+        LOGGER.info(String.format("Получен запрос для setInfoAboutAuthorizedUser: updateUserDto = %s, " +
+                "user = %s", updateUserDto, principal.getName()));
         return ResponseEntity.ok().body(userService.setInfoAboutAuthorizedUser(updateUserDto, principal));
-        // необходима проверка на ошибку 401
     }
 
     @PatchMapping(path = "me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image,
                                        Principal principal) {
+        LOGGER.info(String.format("Получен запрос для setAvatar: image = %s, " +
+                "user = %s", image, principal.getName()));
         userService.setAvatar(image, principal);
         return ResponseEntity.ok().build();
-        // необходима проверка на ошибку 401
+    }
+
+    @GetMapping(path = "me/image")
+    public ResponseEntity<byte[]> getAvatar(Principal principal) {
+        LOGGER.info(String.format("Получен запрос для getAvatar: user = %s", principal.getName()));
+        byte[] imageBytes = userService.getAvatar(principal);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 }

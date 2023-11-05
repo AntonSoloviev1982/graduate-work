@@ -27,7 +27,7 @@ public class UserMapper {
         userDto.setLastName(user.getLastName());
         userDto.setPhone(user.getPhone());
         userDto.setRole(user.getRole());
-        userDto.setImage(user.getImage());
+        userDto.setImage("/users/me/image");
         return userDto;
     }
 

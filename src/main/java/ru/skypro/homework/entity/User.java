@@ -25,10 +25,15 @@ public class User {
 
     private String phone;
 
-    @Enumerated(EnumType.STRING)  //не ORDINAL - чтобы при смене порядка элементов, не поменялись права
+    @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String image; //ссылка на фото (в базе или в файле)
+//    @Lob
+//    @Column(columnDefinition = "oid")
+//    @Basic(fetch=FetchType.LAZY)  //Чтобы не читать зря - FetchType.LAZY
+//    private byte [] image;
+
+    private String image;
 
     @OneToMany(mappedBy = "user")
     private List<Ad> ads;
