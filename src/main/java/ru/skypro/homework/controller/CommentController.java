@@ -19,22 +19,21 @@ public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
     private final CommentService commentService;
-    private final Principal principal;
 
-    public CommentController(CommentService commentService, Principal principal) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.principal = principal;
     }
 
     @GetMapping()
-    public ResponseEntity<Comments> getComments(@PathVariable Integer adId){
+    public ResponseEntity<Comments> getComments(@PathVariable Integer adId, Principal principal){
         logger.info("The get all ad comments method is called.");
         return ResponseEntity.ok(commentService.findComments(adId, principal.getName()));
     }
 
     @PostMapping()
     public ResponseEntity<CommentDtoOut> addComment(@PathVariable Integer adId,
-                                                    @RequestBody CreateOrUpdateComment comment){
+                                                    @RequestBody CreateOrUpdateComment comment,
+                                                    Principal principal){
         logger.info("The comment creation method is called.");
         return ResponseEntity.ok(commentService.createComment(adId, comment, principal.getName()));
     }
@@ -42,14 +41,16 @@ public class CommentController {
     @PatchMapping("{commentId}")
     public ResponseEntity<CommentDtoOut> updateComment(@PathVariable Integer adId,
                                                        @PathVariable Integer commentId,
-                                                       @RequestBody CreateOrUpdateComment comment){
+                                                       @RequestBody CreateOrUpdateComment comment,
+                                                       Principal principal){
         logger.info("The comment update method is called.");
         return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment, principal.getName()));
     }
 
     @DeleteMapping("{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
-                                           @PathVariable Integer commentId){
+                                           @PathVariable Integer commentId,
+                                           Principal principal){
         logger.info("The comment delete method is called.");
         commentService.deleteComment(adId, commentId, principal.getName());
         return ResponseEntity.ok(HttpStatus.OK);
