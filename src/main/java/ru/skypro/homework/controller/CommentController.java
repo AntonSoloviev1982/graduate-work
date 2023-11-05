@@ -31,7 +31,7 @@ public class CommentController {
     @GetMapping()
     public ResponseEntity<Comments> getComments(@PathVariable Integer adId){
         logger.info("The get all ad comments method is called.");
-        return ResponseEntity.ok(commentService.findComments(adId));
+        return ResponseEntity.ok(commentService.findComments(adId, principal.getName()));
     }
 
     @PostMapping()
@@ -46,13 +46,14 @@ public class CommentController {
                                                        @PathVariable Integer commentId,
                                                        @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment update method is called.");
-        return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment,  principal.getName()));
+        return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment, principal.getName()));
     }
 
     @DeleteMapping("{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
                                            @PathVariable Integer commentId){
         logger.info("The comment delete method is called.");
+        commentService.deleteComment(adId, commentId, principal.getName());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

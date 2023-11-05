@@ -27,7 +27,7 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handlerUserNotFound(UserNotFoundException e) {
         LOGGER.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(PasswordsNotEqualsException.class)
