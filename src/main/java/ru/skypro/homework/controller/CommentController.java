@@ -8,32 +8,35 @@ import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentDtoOut;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.service.CommentService;
 
-import java.util.Collections;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("ads/{adId}/comments")
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
-    CommentMapper mapper;
 
-    public CommentController(CommentMapper mapper) {
-        this.mapper = mapper;
+    private final CommentService commentService;
+    private final Principal principal;
+
+    public CommentController(CommentService commentService, Principal principal) {
+        this.commentService = commentService;
+        this.principal = principal;
     }
 
     @GetMapping()
     public ResponseEntity<Comments> getComments(@PathVariable Integer adId){
         logger.info("The get all ad comments method is called.");
-        return ResponseEntity.ok(mapper.toComments(Collections.EMPTY_LIST));
+        return ResponseEntity.ok(commentService.findComments(adId, principal.getName()));
     }
 
     @PostMapping()
     public ResponseEntity<CommentDtoOut> addComment(@PathVariable Integer adId,
                                                     @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment creation method is called.");
-        return ResponseEntity.ok(new CommentDtoOut());
+        return ResponseEntity.ok(commentService.createComment(adId, comment, principal.getName()));
     }
 
     @PatchMapping("{commentId}")
@@ -41,13 +44,14 @@ public class CommentController {
                                                        @PathVariable Integer commentId,
                                                        @RequestBody CreateOrUpdateComment comment){
         logger.info("The comment update method is called.");
-        return ResponseEntity.ok(new CommentDtoOut());
+        return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment, principal.getName()));
     }
 
     @DeleteMapping("{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
                                            @PathVariable Integer commentId){
         logger.info("The comment delete method is called.");
+        commentService.deleteComment(adId, commentId, principal.getName());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
@@ -26,7 +27,7 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handlerUserNotFound(UserNotFoundException e) {
         LOGGER.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(PasswordsNotEqualsException.class)
@@ -39,5 +40,11 @@ public class ExceptionHandler {
     public ResponseEntity<String> handlerEntityNotFound(EntityNotFoundException e){
         LOGGER.error("Entity not found. " + e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found. " + e.getMessage());
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler({HttpClientErrorException.class})
+    public ResponseEntity<String> handlerForbidden(HttpClientErrorException e){
+        LOGGER.error("Forbidden action.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden action.");
     }
 }
