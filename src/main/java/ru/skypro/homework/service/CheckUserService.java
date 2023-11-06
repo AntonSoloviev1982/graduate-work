@@ -3,7 +3,6 @@ package ru.skypro.homework.service;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.AdExtendedDtoOut;
 import ru.skypro.homework.repository.CommentRepository;
-import ru.skypro.homework.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
 
