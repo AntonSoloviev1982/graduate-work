@@ -9,6 +9,6 @@ public class Comments {
 
     private int count;
 
-    private List<CommentDtoOut> results;
+    private List<Comment> results;
 
 }

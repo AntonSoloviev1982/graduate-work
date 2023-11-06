@@ -1,10 +1,11 @@
 package ru.skypro.homework.mapper;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.*;
-import ru.skypro.homework.entity.Ad;
-import ru.skypro.homework.entity.Comment;
+import ru.skypro.homework.entity.AdComment;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.UserRepository;
 
@@ -24,31 +25,32 @@ public class CommentMapper {
         this.adRepository = adRepository;
     }
 
-    public Comment toEntity(CreateOrUpdateComment createOrUpdateComment, Integer adId, Integer userId){
+    public AdComment toEntity(CreateOrUpdateComment createOrUpdateComment, Integer adId, Integer userId){
+        AdComment adComment = new AdComment();
+        adComment.setText(createOrUpdateComment.getText());
+        adComment.setCreatedAt(LocalDateTime.now());
+        adComment.setAd(adRepository.findById(adId).orElseThrow(() -> new EntityNotFoundException("Ad not found.")));
+        adComment.setUser(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found.")));
+        return adComment;
+    }
+
+    public Comment toDto(AdComment adComment){
         Comment comment = new Comment();
-        comment.setText(createOrUpdateComment.getText());
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setAd(adRepository.findById(adId).orElseThrow(() -> new EntityNotFoundException("Ad not found.")));
-        comment.setUser(userRepository.findById(userId).get());
+        User user = adComment.getUser();
+        comment.setAuthor(user.getId());
+        comment.setAuthorImage(user.getImage());
+        comment.setAuthorFirstName(user.getFirstName());
+        comment.setCreatedAt(adComment.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli());
+        comment.setPk(adComment.getId());
+        comment.setText(adComment.getText());
         return comment;
     }
 
-    public CommentDtoOut toDto(Comment comment){
-        CommentDtoOut commentDtoOut = new CommentDtoOut();
-        User user = comment.getUser();
-        commentDtoOut.setAuthor(user.getId());
-        commentDtoOut.setAuthorImage(user.getImage());
-        commentDtoOut.setAuthorFirstName(user.getFirstName());
-        commentDtoOut.setCreatedAt(comment.getCreatedAt().toInstant(ZoneOffset.UTC).toEpochMilli());
-        commentDtoOut.setPk(comment.getId());
-        commentDtoOut.setText(comment.getText());
-        return commentDtoOut;
-    }
-
-    public Comments toComments(List<Comment> list) {
+    @Transactional
+    public Comments toComments(List<AdComment> list) {
         int size = list.size();
         Comments comments = new Comments();
-        List<CommentDtoOut> newList = new ArrayList<>();
+        List<Comment> newList = new ArrayList<>();
         comments.setCount(size);
         for (int i = 0; i < size; i++) {
             newList.add(toDto(list.get(i)));
