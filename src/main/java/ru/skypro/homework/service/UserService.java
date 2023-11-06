@@ -25,8 +25,8 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UserService  {
 
-    @Value("${avatar.dir.path}")
-    private String avatarDir;
+//    @Value("${avatar.dir.path}")
+//    private String avatarDir;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -38,7 +38,7 @@ public class UserService  {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        if (encoder.matches(newPasswordDto.getCurrentPassword(), user.getPassword())) {
+        if (!encoder.matches(newPasswordDto.getCurrentPassword(), user.getPassword())) {
             throw new PasswordsNotEqualsException();
         }
         user.setPassword(encoder.encode(newPasswordDto.getNewPassword()));
