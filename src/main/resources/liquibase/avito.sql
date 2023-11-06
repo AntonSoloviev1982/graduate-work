@@ -12,7 +12,7 @@ CREATE TABLE public.user
     last_name      VARCHAR(16),
     phone          VARCHAR(16),
     role           VARCHAR(16)        NOT NULL,
-    image          VARCHAR(255)
+    image          OID
 );
 
         

@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
+import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.PasswordsNotEqualsException;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -67,14 +68,8 @@ public class UserService  {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        try {                 // "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images"
-            String uploadDir = avatarDir;
-            String fileName = image.getOriginalFilename();
-            String filePath = uploadDir + "/" + fileName;
-            user.setImage(filePath);
-            FileOutputStream fos = new FileOutputStream(filePath);
-            fos.write(image.getBytes());
-            fos.close();
+        try {
+            user.setImage(image.getBytes());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -83,16 +78,41 @@ public class UserService  {
 
     public byte[] getAvatar(Principal principal) {
         String username = principal.getName();
-        String filePath = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username)).getImage();
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            byte[] imageBytes = fis.readAllBytes();
-            fis.close();
-            return imageBytes;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
     }
+
+//    @Transactional
+//    public void setAvatar(MultipartFile image, Principal principal) {
+//        String username = principal.getName();
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UserNotFoundException(username));
+//        try {                 // "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images"
+//            String uploadDir = avatarDir;
+//            String fileName = image.getOriginalFilename();
+//            String filePath = uploadDir + "/" + fileName;
+//            user.setImage(filePath);
+//            FileOutputStream fos = new FileOutputStream(filePath);
+//            fos.write(image.getBytes());
+//            fos.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+//        userRepository.save(user);
+//    }
+//
+//    public byte[] getAvatar(Principal principal) {
+//        String username = principal.getName();
+//        String filePath = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UserNotFoundException(username)).getImage();
+//        try {
+//            FileInputStream fis = new FileInputStream(filePath);
+//            byte[] imageBytes = fis.readAllBytes();
+//            fis.close();
+//            return imageBytes;
+//        } catch (Exception e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+//    }
 
 }
