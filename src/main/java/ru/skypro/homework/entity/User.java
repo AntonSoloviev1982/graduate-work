@@ -28,12 +28,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @Lob
-//    @Column(columnDefinition = "oid")
-//    @Basic(fetch=FetchType.LAZY)  //Чтобы не читать зря - FetchType.LAZY
-//    private byte [] image;
+    @Lob
+    @Column(columnDefinition = "oid")
+    @Basic(fetch=FetchType.LAZY)  //Чтобы не читать зря - FetchType.LAZY
+    private byte [] image;
 
-    private String image;
+//    private String image;
 
     @OneToMany(mappedBy = "user")
     private List<Ad> ads;

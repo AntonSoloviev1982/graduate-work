@@ -66,8 +66,24 @@ public class UserController {
     public ResponseEntity<byte[]> getAvatar(Principal principal) {
         LOGGER.info(String.format("Получен запрос для getAvatar: user = %s", principal.getName()));
         byte[] imageBytes = userService.getAvatar(principal);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(imageBytes, HttpStatus.OK);
     }
+
+//    @PatchMapping(path = "me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<?> setAvatar(@RequestPart("image") MultipartFile image,
+//                                       Principal principal) {
+//        LOGGER.info(String.format("Получен запрос для setAvatar: image = %s, " +
+//                "user = %s", image, principal.getName()));
+//        userService.setAvatar(image, principal);
+//        return ResponseEntity.ok().build();
+//    }
+//
+//    @GetMapping(path = "me/image")
+//    public ResponseEntity<byte[]> getAvatar(Principal principal) {
+//        LOGGER.info(String.format("Получен запрос для getAvatar: user = %s", principal.getName()));
+//        byte[] imageBytes = userService.getAvatar(principal);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.IMAGE_JPEG);
+//        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+//    }
 }

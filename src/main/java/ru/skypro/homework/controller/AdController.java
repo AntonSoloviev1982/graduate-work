@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDtoIn;
@@ -27,6 +28,7 @@ public class AdController {
     }
 
     @GetMapping
+//    @PreAuthorize("permitAll()")
     public AdsDtoOut getAllAds() {
         LOGGER.info("Получен запрос для getAllAds");
         return adService.getAllAds();
