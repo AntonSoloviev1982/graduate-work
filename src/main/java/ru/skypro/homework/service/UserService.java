@@ -1,8 +1,10 @@
 package ru.skypro.homework.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
@@ -21,6 +23,9 @@ import java.security.Principal;
 @Service
 @RequiredArgsConstructor
 public class UserService  {
+
+    @Value("${avatar.dir.path}")
+    private String avatarDir;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -57,12 +62,13 @@ public class UserService  {
         return updateUserDto;
     }
 
+    @Transactional
     public void setAvatar(MultipartFile image, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        try {
-            String uploadDir = "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images";
+        try {                 // "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images"
+            String uploadDir = avatarDir;
             String fileName = image.getOriginalFilename();
             String filePath = uploadDir + "/" + fileName;
             user.setImage(filePath);

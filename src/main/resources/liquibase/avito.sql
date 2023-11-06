@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 --changeset alexander:create_user
-DROP TABLE IF EXISTS comment;
+DROP TABLE IF EXISTS ad_comment;
 DROP TABLE IF EXISTS ad;
 DROP TABLE IF EXISTS public.user;
 CREATE TABLE public.user
@@ -28,8 +28,8 @@ CREATE TABLE ad
     FOREIGN KEY (user_id) REFERENCES public.user (id)
 );
 
---changeset alexander:create_comment
-CREATE TABLE comment
+--changeset alexander:create_ad_comment
+CREATE TABLE ad_comment
 (
     id             SERIAL PRIMARY KEY,
     text           VARCHAR(64)      NOT NULL,

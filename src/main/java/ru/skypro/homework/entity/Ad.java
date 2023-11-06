@@ -25,6 +25,6 @@ public class Ad {
     private byte [] image;
 
     @OneToMany(mappedBy = "ad")
-    private List<Comment> commentList;
+    private List<AdComment> commentList;
 
 }

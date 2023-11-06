@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Comment {
+@Table(name = "ad_comment")
+public class AdComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -17,13 +18,4 @@ public class Comment {
     private Ad ad;
     @ManyToOne
     private User user;
-
-    public Comment(String text, Ad ad, User user) {
-        this.text = text;
-        this.ad = ad;
-        this.user = user;
-    }
-
-    public Comment() {
-    }
 }
