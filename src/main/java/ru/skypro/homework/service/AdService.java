@@ -28,8 +28,9 @@ public class AdService {
     private final UserRepository userRepository;
 
     //Читать текст ошибки в теле ответа фронт не будет. Прокинем сообщение хотя бы для Logger
-    private Supplier<EntityNotFoundException> excSuppl(int id){
-        return ()-> new EntityNotFoundException("Ad with id " + id + " not found");}
+    private Supplier<EntityNotFoundException> excSuppl(int id) {
+        return () -> new EntityNotFoundException("Ad with id " + id + " not found");
+    }
 
     public AdService(AdRepository adRepository, AdMapper adMapper, UserRepository userRepository) {
         this.adRepository = adRepository;
@@ -57,6 +58,7 @@ public class AdService {
                 adRepository.findAllByUserId(user.getId())  //эта часть временная
                         .stream().map(adMapper::toAdDtoOut).collect(Collectors.toList()));
     }
+
     public AdsDtoOut getAllAds() {
         return adMapper.toAdsDtoOut(
                 adRepository.findAll()
@@ -93,4 +95,5 @@ public class AdService {
     public void deleteAd(int id) {
         adRepository.deleteById(id);
     }
+
 }

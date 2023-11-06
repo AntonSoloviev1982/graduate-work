@@ -23,6 +23,7 @@ public class AdController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AdController.class);
     private final AdService adService;
 
+
     public AdController(AdService adService) {
         this.adService = adService;
     }
@@ -50,12 +51,14 @@ public class AdController {
         return adService.getAdById(id);
     }
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByAd(#id) == principal.username")
     public ResponseEntity<String> deleteAd(@PathVariable int id) {
         LOGGER.info("Получен запрос для deleteAd: id = " + id);
         adService.deleteAd(id);
         return ResponseEntity.ok().build();
     }
     @PatchMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByAd(#id) == principal.username")
     public AdDtoOut updateAd(@PathVariable int id, @RequestBody AdDtoIn adDtoIn) {
         LOGGER.info("Получен запрос для updateAd: id = " + id +", adDtoIn = " + adDtoIn);
         return adService.updateAd(id, adDtoIn);
@@ -66,6 +69,7 @@ public class AdController {
         return adService.getMyAds(principal);
     }
     @PatchMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByAd(#id) == principal.username")
     public void updateImage(@PathVariable int id, @RequestPart MultipartFile image) {
         LOGGER.info("Получен запрос для updateImage:  id = " + id + ", image = " + image);
         adService.updateImage(id, image);
@@ -82,4 +86,5 @@ public class AdController {
         //return new ResponseEntity<>(photo, headers, HttpStatus.OK);
         return new ResponseEntity<>(photo, HttpStatus.OK);
     }
+
 }
