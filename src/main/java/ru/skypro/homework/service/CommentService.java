@@ -47,9 +47,8 @@ public class CommentService {
     }
 
     @Transactional
-    public Comments findComments(Integer adId, String userName){
+    public Comments findComments(Integer adId){
         logger.info("Find all comments.");
-        User currentUser = getCurrentUser(userName);    // При обращении не авторизованного пользователя UserNotFoundException
         return  commentMapper.toComments(commentRepository.findAllByAdId(adId));
     }
 
@@ -64,14 +63,9 @@ public class CommentService {
         if(!oldComment.getAd().getId().equals(adId)){
             throw new EntityNotFoundException("You can't change the ad in a comment");
         }
-        User currentUser = getCurrentUser(userName);
-        if(hasPermission(oldComment, currentUser)){
-            oldComment.setText(createOrUpdateComment.getText());
-            oldComment.setCreatedAt(LocalDateTime.now());
-            oldComment.setUser(currentUser);
-        }else {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        }
+        oldComment.setText(createOrUpdateComment.getText());
+        oldComment.setCreatedAt(LocalDateTime.now());
+        oldComment.setUser(getCurrentUser(userName));
         return commentMapper.toDto(commentRepository.save(oldComment));
     }
 
@@ -83,11 +77,7 @@ public class CommentService {
         if(!deletedComment.getAd().getId().equals(adId)){
             throw new EntityNotFoundException("Comment not found.");
         }
-        if(hasPermission(deletedComment, getCurrentUser(userName))){
-            commentRepository.delete(deletedComment);
-        }else {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        }
+        commentRepository.delete(deletedComment);
     }
 
     private User getCurrentUser(String userName){
@@ -95,7 +85,8 @@ public class CommentService {
                 orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
+    /*
     private boolean hasPermission(AdComment comment, User currentUser){
         return currentUser.getRole().equals(Role.ADMIN)||comment.getUser().equals(currentUser);
-    }
+    } */
 }
