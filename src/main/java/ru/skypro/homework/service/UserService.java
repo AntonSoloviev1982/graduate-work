@@ -1,7 +1,6 @@
 package ru.skypro.homework.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,15 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPasswordDto;
 import ru.skypro.homework.dto.UpdateUserDto;
 import ru.skypro.homework.dto.UserDto;
-import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.PasswordsNotEqualsException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 
@@ -25,14 +21,9 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UserService  {
 
-//    @Value("${avatar.dir.path}")
-//    private String avatarDir;
-
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
-
-
 
     public void setPassword(NewPasswordDto newPasswordDto, Principal principal) {
         String username = principal.getName();
@@ -80,6 +71,11 @@ public class UserService  {
         String username = principal.getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username)).getImage();
+    }
+
+    public byte[] getAvatarById(Integer userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User by Id " + userId)).getImage();
     }
 
 //    @Transactional

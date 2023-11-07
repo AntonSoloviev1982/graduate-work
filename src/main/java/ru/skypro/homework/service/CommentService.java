@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Service
 public class CommentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentService.class);
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserRepository userRepository;
@@ -37,7 +37,7 @@ public class CommentService {
     public Comment createComment(Integer adId,
                                  CreateOrUpdateComment createOrUpdateComment,
                                  String userName){
-        logger.info("Create comment.");
+        LOGGER.info("Create comment.");
         return commentMapper.toDto(
                 commentRepository.save(
                         commentMapper.toEntity(createOrUpdateComment, adId, getCurrentUser(userName).getId())));
@@ -45,7 +45,7 @@ public class CommentService {
 
     @Transactional
     public Comments findComments(Integer adId){
-        logger.info("Find all comments.");
+        LOGGER.info("Find all comments.");
         return  commentMapper.toComments(commentRepository.findAllByAdId(adId));
     }
 
@@ -54,7 +54,7 @@ public class CommentService {
                                  Integer commentId,
                                  CreateOrUpdateComment createOrUpdateComment,
                                  String userName){
-        logger.info("Update comment.");
+        LOGGER.info("Update comment.");
         AdComment oldComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new EntityNotFoundException("Comment not found."));
         if(!oldComment.getAd().getId().equals(adId)){
@@ -67,8 +67,8 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Integer adId, Integer commentId, String userName){
-        logger.info("Delete comment.");
+    public void deleteComment(Integer adId, Integer commentId){
+        LOGGER.info("Delete comment.");
         AdComment deletedComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new EntityNotFoundException("Comment not found."));
         if(!deletedComment.getAd().getId().equals(adId)){

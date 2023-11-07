@@ -2,7 +2,6 @@ package ru.skypro.homework.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
 
     @PostMapping("set_password")
     public ResponseEntity<?> setPassword(@RequestBody NewPasswordDto newPasswordDto,
@@ -66,6 +64,13 @@ public class UserController {
     public ResponseEntity<byte[]> getAvatar(Principal principal) {
         LOGGER.info(String.format("Получен запрос для getAvatar: user = %s", principal.getName()));
         byte[] imageBytes = userService.getAvatar(principal);
+        return new ResponseEntity<>(imageBytes, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "{userId}/image")
+    public ResponseEntity<byte[]> getAvatarById(@PathVariable Integer userId) {
+        LOGGER.info(String.format("Получен запрос для getAvatar: userId = %s", userId));
+        byte[] imageBytes = userService.getAvatarById(userId);
         return new ResponseEntity<>(imageBytes, HttpStatus.OK);
     }
 

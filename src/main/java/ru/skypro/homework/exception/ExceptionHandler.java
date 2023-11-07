@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
@@ -42,9 +41,4 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found. " + e.getMessage());
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler({HttpClientErrorException.class})
-    public ResponseEntity<String> handlerForbidden(HttpClientErrorException e){
-        LOGGER.error("Forbidden action.");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden action.");
-    }
 }

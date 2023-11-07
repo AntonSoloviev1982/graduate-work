@@ -17,7 +17,7 @@ import java.security.Principal;
 @RequestMapping("ads")
 @CrossOrigin(value = "http://localhost:3000")
 public class CommentController {
-    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentController.class);
 
     private final CommentService commentService;
 
@@ -27,7 +27,7 @@ public class CommentController {
 
     @GetMapping("{adId}/comments")
     public ResponseEntity<Comments> getComments(@PathVariable Integer adId){
-        logger.info("The get all ad comments method is called.");
+        LOGGER.info("The get all ad comments method is called.");
         return ResponseEntity.ok(commentService.findComments(adId));
     }
 
@@ -36,7 +36,7 @@ public class CommentController {
                                               @RequestBody CreateOrUpdateComment comment,
                                               Principal principal){
         String currentUserName = principal.getName();
-        logger.info("The comment creation method is called by user " + currentUserName);
+        LOGGER.info("The comment creation method is called by user " + currentUserName);
         return ResponseEntity.ok(commentService.createComment(adId, comment, currentUserName));
     }
 
@@ -46,17 +46,16 @@ public class CommentController {
                                                  @PathVariable Integer commentId,
                                                  @RequestBody CreateOrUpdateComment comment,
                                                  Principal principal){
-        logger.info("The comment update method is called.");
+        LOGGER.info("The comment update method is called.");
         return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment, principal.getName()));
     }
 
     @DeleteMapping("{adId}/comments/{commentId}")
     @PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByComment(#commentId) == principal.username")
     public ResponseEntity<?> deleteComment(@PathVariable Integer adId,
-                                           @PathVariable Integer commentId,
-                                           Principal principal){
-        logger.info("The comment delete method is called.");
-        commentService.deleteComment(adId, commentId, principal.getName());
+                                           @PathVariable Integer commentId){
+        LOGGER.info("The comment delete method is called.");
+        commentService.deleteComment(adId, commentId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
