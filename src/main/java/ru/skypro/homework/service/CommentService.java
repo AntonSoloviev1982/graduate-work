@@ -2,14 +2,11 @@ package ru.skypro.homework.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 import ru.skypro.homework.dto.Comment;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entity.AdComment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.UserNotFoundException;
@@ -23,7 +20,7 @@ import java.time.LocalDateTime;
 @Service
 public class CommentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentService.class);
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserRepository userRepository;
@@ -40,16 +37,15 @@ public class CommentService {
     public Comment createComment(Integer adId,
                                  CreateOrUpdateComment createOrUpdateComment,
                                  String userName){
-        logger.info("Create comment.");
+        LOGGER.info("Create comment.");
         return commentMapper.toDto(
                 commentRepository.save(
                         commentMapper.toEntity(createOrUpdateComment, adId, getCurrentUser(userName).getId())));
     }
 
     @Transactional
-    public Comments findComments(Integer adId, String userName){
-        logger.info("Find all comments.");
-        User currentUser = getCurrentUser(userName);    // При обращении не авторизованного пользователя UserNotFoundException
+    public Comments findComments(Integer adId){
+        LOGGER.info("Find all comments.");
         return  commentMapper.toComments(commentRepository.findAllByAdId(adId));
     }
 
@@ -58,36 +54,27 @@ public class CommentService {
                                  Integer commentId,
                                  CreateOrUpdateComment createOrUpdateComment,
                                  String userName){
-        logger.info("Update comment.");
+        LOGGER.info("Update comment.");
         AdComment oldComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new EntityNotFoundException("Comment not found."));
         if(!oldComment.getAd().getId().equals(adId)){
             throw new EntityNotFoundException("You can't change the ad in a comment");
         }
-        User currentUser = getCurrentUser(userName);
-        if(hasPermission(oldComment, currentUser)){
-            oldComment.setText(createOrUpdateComment.getText());
-            oldComment.setCreatedAt(LocalDateTime.now());
-            oldComment.setUser(currentUser);
-        }else {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        }
+        oldComment.setText(createOrUpdateComment.getText());
+        oldComment.setCreatedAt(LocalDateTime.now());
+        oldComment.setUser(getCurrentUser(userName));
         return commentMapper.toDto(commentRepository.save(oldComment));
     }
 
     @Transactional
-    public void deleteComment(Integer adId, Integer commentId, String userName){
-        logger.info("Delete comment.");
+    public void deleteComment(Integer adId, Integer commentId){
+        LOGGER.info("Delete comment.");
         AdComment deletedComment = commentRepository.findById(commentId).
                 orElseThrow(() -> new EntityNotFoundException("Comment not found."));
         if(!deletedComment.getAd().getId().equals(adId)){
             throw new EntityNotFoundException("Comment not found.");
         }
-        if(hasPermission(deletedComment, getCurrentUser(userName))){
-            commentRepository.delete(deletedComment);
-        }else {
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-        }
+        commentRepository.delete(deletedComment);
     }
 
     private User getCurrentUser(String userName){
@@ -95,7 +82,4 @@ public class CommentService {
                 orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
-    private boolean hasPermission(AdComment comment, User currentUser){
-        return currentUser.getRole().equals(Role.ADMIN)||comment.getUser().equals(currentUser);
-    }
 }
