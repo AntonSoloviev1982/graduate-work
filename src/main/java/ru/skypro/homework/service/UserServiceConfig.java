@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-//@RequestScope
 @RequiredArgsConstructor
 public class UserServiceConfig implements UserDetailsService {
 
