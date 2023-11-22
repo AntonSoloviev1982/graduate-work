@@ -54,7 +54,7 @@ public class AdController {
     @PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByAd(#id) == principal.username")
     public ResponseEntity<String> deleteAd(@PathVariable int id) {
         LOGGER.info("Получен запрос для deleteAd: id = " + id);
-        adService.deleteAd(id);
+        adService.deleteAd(id);  //если такой id не существует то возникнет EmptyResultDataAccessException
         return ResponseEntity.ok().build();
     }
     @PatchMapping("{id}")

@@ -2,6 +2,8 @@ package ru.skypro.homework.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.internal.verification.Times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,9 +27,11 @@ import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.mapper.AdMapper;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,6 +55,7 @@ public class AdControllerTest {
 
     Principal principal = mock(Principal.class);
     @Test
+    //без этой аннотации MockMvc.perform будет выдавать NullPointerException
     @WithMockUser(username = "user")
     public void createAdTest()  throws Exception {
         //готовим тело запроса
@@ -64,7 +69,7 @@ public class AdControllerTest {
         user.setId(1);
         user.setUsername("user");
         //затыкаем userRepository.findByUsername
-        when(principal.getName()).thenReturn("user");
+        when(principal.getName()).thenReturn("user"); //имя принципала будем искать в базе
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
 
         //готовим затычку для userRepository.save
@@ -97,6 +102,29 @@ public class AdControllerTest {
                     //проверяем, что к нам вернулся объект, которым мы замокали репозиторий
                     assertThat(actualAdDtoOut).isEqualTo(expectedAdDtoOut);
                 });
+
         //Проверим, чем мы накормили adRepository.save
+        ArgumentCaptor<Ad> adCaptor = ArgumentCaptor.forClass(Ad.class);
+        verify(adRepository,times(1)).save(adCaptor.capture());
+        Ad adFact = adCaptor.getValue();
+        //assertEquals(adBeforeSave, adFact);  //так не равны, поэтому сравниваем поля
+        assertEquals(adBeforeSave.getId(), adFact.getId()); //сравнение null дает истину
+        assertEquals(adBeforeSave.getUser().getId(), adFact.getUser().getId());
+        assertEquals(adBeforeSave.getUser().getUsername(), adFact.getUser().getUsername());
+        assertEquals(adBeforeSave.getPrice(), adFact.getPrice());
+        assertEquals(adBeforeSave.getTitle(), adFact.getTitle());
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = "ADMIN")
+    public void deleteAdTest()  throws Exception {
+        mockMvc.perform(delete("/ads/123").principal(principal)
+                ).andExpect(status().isOk());
+
+        //Проверим, чем мы накормили adRepository.deleteById
+        ArgumentCaptor<Integer> intCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(adRepository,times(1)).deleteById(intCaptor.capture());
+        Integer fact = intCaptor.getValue();
+        assertEquals(123, fact);
     }
 }
