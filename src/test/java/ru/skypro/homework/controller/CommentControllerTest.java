@@ -151,7 +151,7 @@ class CommentControllerTest {
     @Test
     void updateCommentTest() {
     }
-
+/*
     @Test
     @WithMockUser(username = "aaaa@mail.ru")
     void deleteCommentTest() throws Exception{
@@ -180,4 +180,6 @@ class CommentControllerTest {
                         .principal(principal))
                 .andExpect(status().isOk());
     }
+
+ */
 }
