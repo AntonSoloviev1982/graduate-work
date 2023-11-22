@@ -27,4 +27,8 @@ public class Ad {
     @OneToMany(mappedBy = "ad")
     private List<AdComment> commentList;
 
+    @Override  //если не создать toString то отладчик зависает, т.к пытается показать байты фото
+    public String toString() {
+        return "Ad(id=" + id + ", user_id=" + user.getId() + ", title='" + title + "')";
+    }
 }

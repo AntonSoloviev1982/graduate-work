@@ -17,6 +17,7 @@ import ru.skypro.homework.repository.UserRepository;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 public class AdService {
     private final AdRepository adRepository;
     private final AdMapper adMapper;
-
     private final UserRepository userRepository;
 
     //Читать текст ошибки в теле ответа фронт не будет. Прокинем сообщение хотя бы для Logger
@@ -48,21 +48,21 @@ public class AdService {
         adRepository.save(ad);
     }
 
+    @Transactional  //для получения user.getAds()
+    //без @Transactional возникает
+    //PSQLException: Большие объекты не могут использоваться в режиме авто-подтверждения (auto-commit).
+    //хотя мы не обращаемся ни к каким картинкам
     public AdsDtoOut getMyAds(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        //пока не знаю, как получить User или userId
-        //Если бы был User, то можно взять у него объявления без обращения к репозиторию
-        return adMapper.toAdsDtoOut(
-                adRepository.findAllByUserId(user.getId())  //эта часть временная
-                        .stream().map(adMapper::toAdDtoOut).collect(Collectors.toList()));
+        List<Ad> ads = user.getAds();
+        //List<Ad> ads = adRepository.findAllByUserId(user.getId()); было временное решение
+        return adMapper.toAdsDtoOut(ads);
     }
 
     public AdsDtoOut getAllAds() {
-        return adMapper.toAdsDtoOut(
-                adRepository.findAll()
-                        .stream().map(adMapper::toAdDtoOut).collect(Collectors.toList()));
+        return adMapper.toAdsDtoOut(adRepository.findAll());
     }
 
     @Transactional
@@ -75,13 +75,15 @@ public class AdService {
     }
 
     public AdDtoOut createAd(AdDtoIn adDtoIn, MultipartFile image, Principal principal) {
-        Ad ad = adMapper.toEntity(adDtoIn, principal);
+        Ad adBeforeSave = adMapper.toEntity(adDtoIn, principal);
         try {
-            ad.setImage(image.getBytes());
+            adBeforeSave.setImage(image.getBytes());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return adMapper.toAdDtoOut(adRepository.save(ad));
+        //adAfterSave отличается от adBeforeSave тем, что в нем проставлен id
+        Ad adAfterSave = adRepository.save(adBeforeSave);
+        return adMapper.toAdDtoOut(adAfterSave);
     }
 
     public AdDtoOut updateAd(int id, AdDtoIn adDtoIn) {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 @RestControllerAdvice
 public class ExceptionHandler {
@@ -35,8 +36,10 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler({EntityNotFoundException.class})
-    public ResponseEntity<String> handlerEntityNotFound(EntityNotFoundException e){
+    @org.springframework.web.bind.annotation.ExceptionHandler({
+            EntityNotFoundException.class,
+            EmptyResultDataAccessException.class}) //EmptyResultDataAccessException - при удалении несуществующего
+    public ResponseEntity<String> handlerEntityNotFound(Exception e){
         LOGGER.error("Entity not found. " + e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found. " + e.getMessage());
     }

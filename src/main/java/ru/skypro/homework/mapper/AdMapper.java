@@ -2,6 +2,7 @@ package ru.skypro.homework.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.AdDtoIn;
 import ru.skypro.homework.dto.AdDtoOut;
 import ru.skypro.homework.dto.AdExtendedDtoOut;
@@ -14,12 +15,11 @@ import ru.skypro.homework.service.UserService;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class AdMapper {
-    //Можно было бы AdDtoIn использовать, передав в сервис, для заполнения полей при сохранении,
-    //но мы превращаем AdDtoIn в Ad здесь, чтобы "отделить логику маппинга от логики сохранения"
 
     private final UserRepository userRepository;
 
@@ -28,14 +28,15 @@ public class AdMapper {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-//        user.setId(1);
         ad.setUser(user);
         ad.setTitle(adDtoIn.getTitle());
         ad.setPrice(adDtoIn.getPrice());
         ad.setDescription(adDtoIn.getDescription());
         return ad;
     }
+
     public AdDtoOut toAdDtoOut(Ad ad) {
+        if (ad==null) return null;
         AdDtoOut adDtoOut = new AdDtoOut();
         adDtoOut.setPk(ad.getId());
         adDtoOut.setAuthor(ad.getUser().getId());
@@ -59,10 +60,10 @@ public class AdMapper {
         adExtendedDtoOut.setImage("/ads/"+ad.getId()+"/image");
         return adExtendedDtoOut;
     }
-    public AdsDtoOut toAdsDtoOut(List<AdDtoOut> list) {
+    public AdsDtoOut toAdsDtoOut(List<Ad> list) {
         AdsDtoOut adsDtoOut = new AdsDtoOut();
         adsDtoOut.setCount(list.size());
-        adsDtoOut.setResults(list);
+        adsDtoOut.setResults(list.stream().map(this::toAdDtoOut).collect(Collectors.toList()));
         return adsDtoOut;
     }
 }

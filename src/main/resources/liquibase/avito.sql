@@ -36,6 +36,6 @@ CREATE TABLE ad_comment
     created_at     TIMESTAMP        NOT NULL,
     ad_id          INTEGER          NOT NULL,
     user_id        INTEGER          NOT NULL,
-    FOREIGN KEY (ad_id) REFERENCES ad (id),
+    FOREIGN KEY (ad_id) REFERENCES ad (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES public.user (id)
 );
