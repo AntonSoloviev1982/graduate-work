@@ -40,6 +40,5 @@ public class User {
                //наверно пытается показать циклическую связь user-ad
     public String toString() {
         return "User(id=" + id + ", name='" + username + "', role=" + role + ")";
-    };
-
+    }
 }

@@ -2,7 +2,6 @@ package ru.skypro.homework.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.AdDtoIn;
 import ru.skypro.homework.dto.AdDtoOut;
 import ru.skypro.homework.dto.AdExtendedDtoOut;
@@ -11,7 +10,6 @@ import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.repository.UserRepository;
-import ru.skypro.homework.service.UserService;
 
 import java.security.Principal;
 import java.util.Collections;

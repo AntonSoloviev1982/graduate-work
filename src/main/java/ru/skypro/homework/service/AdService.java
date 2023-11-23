@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Service
 public class AdService {
