@@ -29,7 +29,7 @@ public class AdController {
     }
 
     @GetMapping
-//    @PreAuthorize("permitAll()")
+    //@PreAuthorize("permitAll()")
     public AdsDtoOut getAllAds() {
         LOGGER.info("Получен запрос для getAllAds");
         return adService.getAllAds();

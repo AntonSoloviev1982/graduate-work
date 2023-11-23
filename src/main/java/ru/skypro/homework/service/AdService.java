@@ -87,6 +87,9 @@ public class AdService {
     }
 
     public AdDtoOut updateAd(int id, AdDtoIn adDtoIn) {
+        //Поскольку в AdDtoIn - не все реквизиты, а сохранить надо все,
+        //придется читать Ad для получения недостающих.
+        //Хотя запросом к базе можно обновить только требуемые.
         Ad ad = adRepository.findById(id).orElseThrow(excSuppl(id));
         ad.setTitle(adDtoIn.getTitle());
         ad.setPrice(adDtoIn.getPrice());

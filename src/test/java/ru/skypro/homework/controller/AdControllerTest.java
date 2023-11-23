@@ -72,7 +72,7 @@ public class AdControllerTest {
         when(principal.getName()).thenReturn("user"); //имя принципала будем искать в базе
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
 
-        //готовим затычку для userRepository.save
+        //готовим затычку для adRepository.save
         Ad adBeforeSave = adMapper.toEntity(adDtoIn, principal);
         Ad adAfterSave = adMapper.toEntity(adDtoIn, principal);
         adAfterSave.setId(123);
@@ -107,7 +107,8 @@ public class AdControllerTest {
         ArgumentCaptor<Ad> adCaptor = ArgumentCaptor.forClass(Ad.class);
         verify(adRepository,times(1)).save(adCaptor.capture());
         Ad adFact = adCaptor.getValue();
-        //assertEquals(adBeforeSave, adFact);  //так не равны, поэтому сравниваем поля
+        //assertThat(adBeforeSave).isEqualTo(adFact); //так не равны
+        //assertEquals(adBeforeSave, adFact);         //и так не равны, поэтому сравниваем поля
         assertEquals(adBeforeSave.getId(), adFact.getId()); //сравнение null дает истину
         assertEquals(adBeforeSave.getUser().getId(), adFact.getUser().getId());
         assertEquals(adBeforeSave.getUser().getUsername(), adFact.getUser().getUsername());
@@ -126,5 +127,54 @@ public class AdControllerTest {
         verify(adRepository,times(1)).deleteById(intCaptor.capture());
         Integer fact = intCaptor.getValue();
         assertEquals(123, fact);
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = "ADMIN")
+    public void updateAdTest()  throws Exception {
+        //готовим тело запроса с параметром 111
+        AdDtoIn adDtoIn = new AdDtoIn();
+        adDtoIn.setTitle("MyAd");
+        adDtoIn.setPrice(123);
+
+        //готовим затычку для adRepository.findById
+        Ad adFromRepository = new Ad();
+        adFromRepository.setId(222);
+        adFromRepository.setTitle("Старое название");
+        when(adRepository.findById(111)).thenReturn(Optional.of(adFromRepository));
+
+        //готовим затычку для adRepository.save
+        Ad adAfterSave = new Ad();
+        adAfterSave.setId(333); //все id специально разные, чтобы подтвердить передачу информации по этапам
+        adAfterSave.setUser(new User()); //чтобы не было NullPointerException при формировании DtoOut
+        adAfterSave.getUser().setId(321); //чтобы не было NullPointerException при формировании DtoOut
+        adAfterSave.setTitle("New Title");
+        //Если в save задать adBeforeSave, то сравнение не удастся и заглушка не сработает
+        //Поэтому затыкаю через any(), но потом проверю параметр save
+        when(adRepository.save(any())).thenReturn(adAfterSave);
+
+        //этот ожидаемый результат гарантирован, если сработает заглушка save
+        AdDtoOut expectedAdDtoOut = adMapper.toAdDtoOut(adAfterSave);
+
+        mockMvc.perform(patch("/ads/111")
+                        .content(objectMapper.writeValueAsString(adDtoIn))
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(result -> {
+                    String content = result.getResponse().getContentAsString();
+                    AdDtoOut actualAdDtoOut = objectMapper.readValue(content, AdDtoOut.class);
+                    //проверяем, что к нам вернулся объект, которым мы замокали репозиторий
+                    assertThat(actualAdDtoOut).isEqualTo(expectedAdDtoOut);
+                });
+
+        //Проверим, чем мы накормили adRepository.save
+        ArgumentCaptor<Ad> adCaptor = ArgumentCaptor.forClass(Ad.class);
+        verify(adRepository,times(1)).save(adCaptor.capture());
+        Ad adArgumentOfSave = adCaptor.getValue();
+        //Id на входе в save д.б. равен прочитанному из репозитория
+        assertEquals(adFromRepository.getId(), adArgumentOfSave.getId()); //222
+        //Цена и заголовок д.б. равны переданным в запросе
+        assertEquals(adDtoIn.getPrice(), adArgumentOfSave.getPrice());
+        assertEquals(adDtoIn.getTitle(), adArgumentOfSave.getTitle());
     }
 }
