@@ -1,28 +1,19 @@
 package ru.skypro.homework.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Condition;
-import org.assertj.core.internal.bytebuddy.implementation.bytecode.Throw;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.config.WebSecurityConfig;
-import ru.skypro.homework.dto.Comment;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entity.Ad;
@@ -166,20 +157,20 @@ class CommentControllerTest {
         adComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
         adComment.setUser(userRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("1")));
 
+        String currentUser = user1.getUsername();
         Principal principal = new Principal() {
             @Override
             public String getName() {
-                return user1.getUsername();
+                return currentUser;
             }
         };
 
         when(commentRepository.findById(any(Integer.class))).thenReturn(Optional.of(adComment));
-        when(checkUserService.getUsernameByComment(any(Integer.class))).thenReturn(user1.getUsername());
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/ads/3/comments/777")
                         .principal(principal))
                 .andExpect(status().isOk());
     }
+*/
 
- */
 }
