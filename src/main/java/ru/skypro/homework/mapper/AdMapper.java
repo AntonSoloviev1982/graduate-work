@@ -14,6 +14,7 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,7 @@ public class AdMapper {
         return adExtendedDtoOut;
     }
     public AdsDtoOut toAdsDtoOut(List<Ad> list) {
+        if (list==null) {list = Collections.EMPTY_LIST;} //для тестов и на всякий случай
         AdsDtoOut adsDtoOut = new AdsDtoOut();
         adsDtoOut.setCount(list.size());
         adsDtoOut.setResults(list.stream().map(this::toAdDtoOut).collect(Collectors.toList()));

@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,6 +19,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.skypro.homework.config.WebSecurityConfig;
 import ru.skypro.homework.dto.AdDtoOut;
+import ru.skypro.homework.dto.AdExtendedDtoOut;
+import ru.skypro.homework.dto.AdsDtoOut;
 import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.dto.AdDtoIn;
 import ru.skypro.homework.entity.User;
@@ -27,6 +30,8 @@ import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.mapper.AdMapper;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +58,6 @@ public class AdControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    Principal principal = mock(Principal.class);
     @Test
     //без этой аннотации MockMvc.perform будет выдавать NullPointerException
     @WithMockUser(username = "user")
@@ -69,12 +73,13 @@ public class AdControllerTest {
         user.setId(1);
         user.setUsername("user");
         //затыкаем userRepository.findByUsername
+        Principal principal = mock(Principal.class); //этого principal будем передавать в adMapper.toEntity
         when(principal.getName()).thenReturn("user"); //имя принципала будем искать в базе
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
 
         //готовим затычку для adRepository.save
         Ad adBeforeSave = adMapper.toEntity(adDtoIn, principal);
-        Ad adAfterSave = adMapper.toEntity(adDtoIn, principal);
+        Ad adAfterSave = adMapper.toEntity(adDtoIn, principal); //нужна другая ссылка, отличная от adBeforeSave
         adAfterSave.setId(123);
         //Если в save задать adBeforeSave, то сравнение не удастся и заглушка не сработает
         //Поэтому затыкаю через any(), но потом проверю параметр
@@ -119,7 +124,7 @@ public class AdControllerTest {
     @Test
     @WithMockUser(username = "user", roles = "ADMIN")
     public void deleteAdTest()  throws Exception {
-        mockMvc.perform(delete("/ads/123").principal(principal)
+        mockMvc.perform(delete("/ads/123")
                 ).andExpect(status().isOk());
 
         //Проверим, чем мы накормили adRepository.deleteById
@@ -174,7 +179,81 @@ public class AdControllerTest {
         //Id на входе в save д.б. равен прочитанному из репозитория
         assertEquals(adFromRepository.getId(), adArgumentOfSave.getId()); //222
         //Цена и заголовок д.б. равны переданным в запросе
-        assertEquals(adDtoIn.getPrice(), adArgumentOfSave.getPrice());
-        assertEquals(adDtoIn.getTitle(), adArgumentOfSave.getTitle());
+        assertEquals(adDtoIn.getPrice(), adArgumentOfSave.getPrice());    //123
+        assertEquals(adDtoIn.getTitle(), adArgumentOfSave.getTitle());    //MyAd
+    }
+
+    @Test
+    @WithMockUser(username = "user") //иначе 401 Unauthorized, ведь Spring должен подложить principal в параметры
+    public void getMyAdsTest()  throws Exception {
+        //готовим затычку для userRepository.findByUsername
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user");
+        //созданный юзер содержит коллекцию объявлений, которые должны вернуться
+        Ad ad = new Ad();
+        ad.setId(222);
+        ad.setUser(user);
+        ad.setTitle("MyAd");
+        user.setAds(Collections.singletonList(ad));
+        //затыкаем userRepository.findByUsername
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+
+        mockMvc.perform(get("/ads/me"))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String content = result.getResponse().getContentAsString();
+                    AdsDtoOut actualAdsDtoOut = objectMapper.readValue(content, AdsDtoOut.class);
+                    //проверяем, что к нам вернулся список, который мы пришили к пользователю
+                    assertThat(actualAdsDtoOut).isEqualTo(adMapper.toAdsDtoOut(user.getAds()));
+                });
+    }
+    @Test
+    public void getAllAdsTest() throws Exception {
+        //готовим затычку для adRepository.findAll
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user");
+        Ad ad = new Ad();
+        ad.setId(222);
+        ad.setUser(user);
+        ad.setTitle("MyAd");
+        List<Ad> listAd = Collections.singletonList(ad);
+        //затыкаем adRepository.findAll
+        when(adRepository.findAll()).thenReturn(listAd);
+        mockMvc.perform(get("/ads"))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String content = result.getResponse().getContentAsString();
+                    AdsDtoOut actualAdsDtoOut = objectMapper.readValue(content, AdsDtoOut.class);
+                    //проверяем, что к нам вернулся список, которым мы замокали репозиторий
+                    assertThat(actualAdsDtoOut).isEqualTo(adMapper.toAdsDtoOut(listAd));
+                });
+    }
+    @Test
+    //Не разобрался, почему для запуска запроса потребовался WithMockUser. Кто подскажет?
+    //У этого эндпойнта нет ни @PreAuthorize, ни principal.
+    //Например, getAllAdsTest проходит без проблем без указания @WithMockUser
+    @WithMockUser(username = "user") //если не задать - 401 Unauthorized
+    public void getAdExtendedTest() throws Exception {
+        //готовим затычку для adRepository.findById
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user");
+        Ad ad = new Ad();
+        ad.setId(222);
+        ad.setUser(user);
+        ad.setTitle("MyAd");
+        //затыкаем adRepository.findById.
+        //К userRepository явно мы не обращаемся, поэтому его мокать не надо
+        when(adRepository.findById(111)).thenReturn(Optional.of(ad));
+        mockMvc.perform(get("/ads/111"))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String content = result.getResponse().getContentAsString();
+                    AdExtendedDtoOut actualAdExtendedDtoOut = objectMapper.readValue(content, AdExtendedDtoOut.class);
+                    //проверяем, что к нам вернулось объявление, которым мы замокали репозиторий
+                    assertThat(actualAdExtendedDtoOut).isEqualTo(adMapper.toAdExtendedDtoOut(ad));
+                });
     }
 }
