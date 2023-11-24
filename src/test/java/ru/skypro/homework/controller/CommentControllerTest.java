@@ -59,8 +59,9 @@ class CommentControllerTest {
     private CommentMapper commentMapper;
     @SpyBean
     private CommentService commentService;
-    @SpyBean
-    private CheckUserService checkUserService;
+    //если roles = "ADMIN", то checkUserService не используется
+    //@SpyBean
+    //private CheckUserService checkUserService;
     @MockBean
     private AdService adService;
 
