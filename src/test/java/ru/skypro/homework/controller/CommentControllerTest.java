@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -28,8 +29,9 @@ import ru.skypro.homework.service.CheckUserService;
 import ru.skypro.homework.service.CommentService;
 
 import javax.persistence.EntityNotFoundException;
-import java.security.Principal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -97,7 +99,43 @@ class CommentControllerTest {
     }
 
     @Test
-    void getCommentsTest() {
+    @WithMockUser(username = "bbbb@mail.ru")
+    void getCommentsTest() throws Exception {
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user1))
+                .thenReturn(Optional.of(user2));
+        when(userRepository.findById(any(Integer.class))).thenReturn(Optional.of(user1))
+                .thenReturn(Optional.of(user2));
+        when(adRepository.findById(any(Integer.class))).thenReturn(Optional.of(ad));
+
+        AdComment adComment = new AdComment();
+        adComment.setId(777);
+        adComment.setText("Тестовый комментарий 1.");
+        adComment.setCreatedAt(LocalDateTime.now());
+        adComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
+        adComment.setUser(userRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("1")));
+        AdComment otherComment = new AdComment();
+        otherComment.setId(888);
+        otherComment.setText("Тестовый комментарий 2.");
+        otherComment.setCreatedAt(LocalDateTime.now().plusMinutes(10));
+        otherComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
+        otherComment.setUser(userRepository.findById(2).orElseThrow(() -> new EntityNotFoundException("2")));
+
+        when(commentRepository.findAllByAdId(any(Integer.class))).thenReturn(List.of(adComment, otherComment));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/ads/3/comments")
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
+                                HttpHeaders.encodeBasicAuth("bbbb@mail.ru", "bbbb2222", StandardCharsets.UTF_8)))
+                .andExpect(status().isOk())
+                .andExpect( result -> {
+                    jsonPath("$[0].author").value(1);
+                    jsonPath("$[0].authorFirstName").value("Harry");
+                    jsonPath("$[0].text").value("Тестовый комментарий 1.");
+                    jsonPath("$[1].author").value(2);
+                    jsonPath("$[1].authorFirstName").value("Hermione");
+                    jsonPath("$[1].text").value("Тестовый комментарий 2.");
+                });
+        verify(commentRepository, times(1)).findAllByAdId(any(Integer.class));
     }
 
     @Test
@@ -117,17 +155,12 @@ class CommentControllerTest {
         adComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
         adComment.setUser(userRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("1")));
 
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return user1.getUsername();
-            }
-        };
         when(commentRepository.save(any(AdComment.class))).thenReturn(adComment);
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/ads/3/comments")
                         .content(objectMapper.writeValueAsString(createOrUpdateComment))
-                        .principal(principal)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
+                                HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect( result -> {
@@ -140,11 +173,41 @@ class CommentControllerTest {
     }
 
     @Test
-    void updateCommentTest() {
+    @WithMockUser(username = "aaaa@mail.ru", roles = "ADMIN")
+    void updateCommentTest() throws Exception {
+        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment();
+        createOrUpdateComment.setText("Новый комментарий.");
+
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user1));
+        when(userRepository.findById(any(Integer.class))).thenReturn(Optional.of(user1));
+        when(adRepository.findById(any(Integer.class))).thenReturn(Optional.of(ad));
+
+        AdComment adComment = new AdComment();
+        adComment.setId(777);
+        adComment.setText("Тестовый комментарий 1.");
+        adComment.setCreatedAt(LocalDateTime.now());
+        adComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
+        adComment.setUser(userRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("1")));
+
+        when(commentRepository.save(any(AdComment.class))).thenReturn(adComment);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/ads/3/comments")
+                        .content(objectMapper.writeValueAsString(createOrUpdateComment))
+                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
+                                HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect( result -> {
+                    jsonPath("$.author").value(1);
+                    jsonPath("$.authorFirstName").value("Harry");
+                    jsonPath("$.text").value("Новый комментарий.");
+                });
+        verify(commentRepository, times(1)).save(any(AdComment.class));
+
     }
-/*
+
     @Test
-    @WithMockUser(username = "aaaa@mail.ru")
+    @WithMockUser(username = "aaaa@mail.ru", roles = "ADMIN")
     void deleteCommentTest() throws Exception{
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user1));
         when(userRepository.findById(any(Integer.class))).thenReturn(Optional.of(user1));
@@ -157,20 +220,14 @@ class CommentControllerTest {
         adComment.setAd(adRepository.findById(3).orElseThrow(() -> new EntityNotFoundException("3")));
         adComment.setUser(userRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("1")));
 
-        String currentUser = user1.getUsername();
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return currentUser;
-            }
-        };
-
         when(commentRepository.findById(any(Integer.class))).thenReturn(Optional.of(adComment));
+
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/ads/3/comments/777")
-                        .principal(principal))
+                .header(HttpHeaders.AUTHORIZATION, "Basic " +
+                        HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8)))
                 .andExpect(status().isOk());
+        verify(commentRepository, times(1)).delete(any(AdComment.class));
     }
-*/
 
 }
