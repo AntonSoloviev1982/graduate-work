@@ -23,7 +23,6 @@ public class AdController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AdController.class);
     private final AdService adService;
 
-
     public AdController(AdService adService) {
         this.adService = adService;
     }

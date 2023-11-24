@@ -1,14 +1,13 @@
 package ru.skypro.homework.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.internal.verification.Times;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -25,12 +24,13 @@ import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.dto.AdDtoIn;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.mapper.AdMapper;
+import ru.skypro.homework.service.CheckUserService;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AdController.class)
-@Import(WebSecurityConfig.class)
+@Import({WebSecurityConfig.class, CheckUserService.class})
 public class AdControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -51,17 +51,29 @@ public class AdControllerTest {
     private AdRepository adRepository;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private CommentRepository commentRepository; //для конструктора CheckUserService
     @SpyBean
     private AdService adService;
     @SpyBean
     private AdMapper adMapper;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ApplicationContext appContext;  //для отладки. Посмотреть какие бины есть
+
+    //почему-то созданный таким образом (через @SpyBean) бин не виден для
+    //@PreAuthorize("hasRole('ADMIN') or @CheckUserService.getUsernameByAd(#id) == principal.username")
+    //возникает NoSuchBeanDefinitionException
+    //Сделал через @Import
+    //@SpyBean
+    //private CheckUserService checkUserService;
 
     @Test
     //без этой аннотации MockMvc.perform будет выдавать NullPointerException
     @WithMockUser(username = "user")
     public void createAdTest()  throws Exception {
+
         //готовим тело запроса
         AdDtoIn adDtoIn = new AdDtoIn();
         adDtoIn.setTitle("MyAd");
@@ -122,8 +134,16 @@ public class AdControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = "ADMIN")
+    @WithMockUser(username = "user", roles = "USER")
+    //USER специально, чтобы задействовать @CheckUserService
     public void deleteAdTest()  throws Exception {
+        //готовим затычку для adRepository.findById - вызывается из CheckUserService
+        Ad ad = new Ad();
+        ad.setId(333);
+        ad.setUser(new User());
+        ad.getUser().setUsername("user"); //user - имя принципала по умолчанию
+
+        when(adRepository.findById(123)).thenReturn(Optional.of(ad));
         mockMvc.perform(delete("/ads/123")
                 ).andExpect(status().isOk());
 
