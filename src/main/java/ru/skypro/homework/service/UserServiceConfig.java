@@ -1,6 +1,7 @@
 package ru.skypro.homework.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,11 +22,23 @@ public class UserServiceConfig implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-
+    /**
+     * Метод для поиска пользователя в таблице user по username.
+     * @param username username пользователя.
+     * @return Optional объект класса User.
+     */
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Метод для аутентификации пользователя в Spring Security. Поиск пользователя в таблице user
+     * с помощью метода {@link UserServiceConfig#findByUsername(String)}. Преобразование объекта
+     * класса User в объект класса UserDetails.
+     * @param username username пользователя.
+     * @return объект класса UserDetails.
+     * @throws UsernameNotFoundException если пользователь не найден.
+     */
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

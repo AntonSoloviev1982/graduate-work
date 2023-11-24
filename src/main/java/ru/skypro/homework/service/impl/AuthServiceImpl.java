@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -28,6 +29,12 @@ public class AuthServiceImpl implements AuthService {
         this.userMapper = userMapper;
     }
 
+    /**
+     * Метод для логирования.
+     * @param userName username пользователя.
+     * @param password пароль пользователя.
+     * @return true, если логирование прошло успешно, в противном случае возвращается false.
+     */
     @Override
     public boolean login(String userName, String password) {
         if (userServiceConfig.findByUsername(userName).isEmpty()) {
@@ -37,6 +44,14 @@ public class AuthServiceImpl implements AuthService {
         return encoder.matches(password, userDetails.getPassword());
     }
 
+    /**
+     * Метод для регистрации нового пользователя, пользователь сохраняется в таблице user.
+     * Для проверки наличия пользователя в таблице user используется
+     * метод {@link UserServiceConfig#findByUsername(String)}.
+     * Происходит кодировка пароля пользователя с помощью бина PasswordEncoder.
+     * @param register Dto Register.
+     * @return true, если пользователь отсутствует в таблице user, в противном случае возвращается false.
+     */
     @Override
     public boolean register(Register register) {
         if (userServiceConfig.findByUsername(register.getUsername()).isPresent()) {
