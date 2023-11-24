@@ -25,6 +25,15 @@ public class UserService  {
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
 
+    /**
+     * Метод для смены пароля пользователя.
+     * Кодировка нового пароля пользователя с помощью бина PasswordEncoder.
+     * @param newPasswordDto Dto NewPasswordDto.
+     * @param principal интерфейс для получения username пользователя.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     * @throws PasswordsNotEqualsException выбрасывается, если текущий пароль в NewPasswordDto
+     * не совпадает с паролем в таблице user.
+     */
     public void setPassword(NewPasswordDto newPasswordDto, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
@@ -36,6 +45,12 @@ public class UserService  {
         userRepository.save(user);
     }
 
+    /**
+     * Метод для получения информации об аутентифицированном пользователе.
+     * @param principal интерфейс для получения username пользователя.
+     * @return Dto UserDto.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     */
     public UserDto getInfoAboutAuthorizedUser(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
@@ -43,6 +58,13 @@ public class UserService  {
         return userMapper.userToUserDto(user);
     }
 
+    /**
+     * Метод для изменения информации аутентифицированного пользователя.
+     * @param updateUserDto Dto UpdateUserDto.
+     * @param principal интерфейс для получения username пользователя.
+     * @return Dto UpdateUserDto.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     */
     public UpdateUserDto setInfoAboutAuthorizedUser(UpdateUserDto updateUserDto, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
@@ -54,6 +76,13 @@ public class UserService  {
         return updateUserDto;
     }
 
+    /**
+     * Метод для изменения аватарки пользователя.
+     * @param image картинка с аватаркой.
+     * @param principal интерфейс для получения username пользователя.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     * @throws IOException выбрасывается, если возникают проблемы при получении картинки.
+     */
     @Transactional
     public void setAvatar(MultipartFile image, Principal principal) {
         String username = principal.getName();
@@ -67,48 +96,28 @@ public class UserService  {
         userRepository.save(user);
     }
 
+    /**
+     * Метод для получения аватарки пользователя из таблицы user.
+     * @param principal интерфейс для получения username пользователя.
+     * @return аватарка в виде массива байтов.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     */
     public byte[] getAvatar(Principal principal) {
         String username = principal.getName();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username)).getImage();
     }
 
+    /**
+     * Метод для получения аватарки пользователя из таблицы user по id пользователя.
+     * @param userId идентификатор пользователя.
+     * @return аватарка в виде массива байтов.
+     * @throws UserNotFoundException выбрасывается, если пользователь не найден в таблице user.
+     */
     public byte[] getAvatarById(Integer userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User by Id " + userId)).getImage();
     }
 
-//    @Transactional
-//    public void setAvatar(MultipartFile image, Principal principal) {
-//        String username = principal.getName();
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new UserNotFoundException(username));
-//        try {                 // "C:/Users/Anton/IdeaProjects/graduate-work/src/main/java/ru/skypro/homework/images"
-//            String uploadDir = avatarDir;
-//            String fileName = image.getOriginalFilename();
-//            String filePath = uploadDir + "/" + fileName;
-//            user.setImage(filePath);
-//            FileOutputStream fos = new FileOutputStream(filePath);
-//            fos.write(image.getBytes());
-//            fos.close();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
-//        userRepository.save(user);
-//    }
-//
-//    public byte[] getAvatar(Principal principal) {
-//        String username = principal.getName();
-//        String filePath = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new UserNotFoundException(username)).getImage();
-//        try {
-//            FileInputStream fis = new FileInputStream(filePath);
-//            byte[] imageBytes = fis.readAllBytes();
-//            fis.close();
-//            return imageBytes;
-//        } catch (Exception e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
-//    }
 
 }
