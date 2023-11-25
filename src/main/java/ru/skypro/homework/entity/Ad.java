@@ -17,14 +17,13 @@ public class Ad {
     private int price;	        //0-10000000
     private String description; //8-64
 
-    //Чтобы не читать зря - поставил FetchType.LAZY
     @Lob
     @Column(columnDefinition = "oid")
     @Basic(fetch=FetchType.LAZY)  //Чтобы не читать зря - FetchType.LAZY
     //@Type(type = "org.hibernate.type.ImageType") вредная аннотация, с ней не работает
     private byte [] image;
 
-    @OneToMany(mappedBy = "ad")
+    @OneToMany(mappedBy = "ad")  //, cascade = CascadeType.REMOVE) работает и без этого
     private List<AdComment> commentList;
 
     @Override  //если не создать toString то отладчик зависает, т.к пытается показать байты фото

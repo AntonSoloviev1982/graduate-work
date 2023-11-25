@@ -21,7 +21,13 @@ import java.util.stream.Collectors;
 public class AdMapper {
 
     private final UserRepository userRepository;
-
+    /**
+     * Преобразует информацию об объявлении во входном формате в объект класса Ad.<br>
+     * Используется метод репозитория userRepository.findByUserName для идентификации автора
+     * @param adDtoIn информация об объявлении во входном формате {@link AdDtoIn}.
+     * @param principal принципал, чье имя используется для идентификации автора
+     * @return объект класса {@link Ad}.
+     */
     public Ad toEntity(AdDtoIn adDtoIn, Principal principal) {
         Ad ad = new Ad();
         String username = principal.getName();
@@ -33,7 +39,11 @@ public class AdMapper {
         ad.setDescription(adDtoIn.getDescription());
         return ad;
     }
-
+    /**
+     * Преобразует объект класса Ad в выходной формат.<br>
+     * @param ad объект класса {@link Ad}
+     * @return информация об объявлении во выходном формате {@link AdDtoOut}.
+     */
     public AdDtoOut toAdDtoOut(Ad ad) {
         if (ad==null) return null;
         AdDtoOut adDtoOut = new AdDtoOut();
@@ -46,6 +56,11 @@ public class AdMapper {
 
         return adDtoOut;
     }
+    /**
+     * Преобразует объект класса Ad в расширенный выходной формат с подробной информацией об авторе.<br>
+     * @param ad объект класса {@link Ad}
+     * @return информация об объявлении в расширенном выходном формате {@link AdExtendedDtoOut}.
+     */
     public AdExtendedDtoOut toAdExtendedDtoOut(Ad ad) {
         AdExtendedDtoOut adExtendedDtoOut = new AdExtendedDtoOut();
         adExtendedDtoOut.setPk(ad.getId());
@@ -59,6 +74,11 @@ public class AdMapper {
         adExtendedDtoOut.setImage("/ads/"+ad.getId()+"/image");
         return adExtendedDtoOut;
     }
+    /**
+     * Преобразует список объявлений в выходной формат с указанием количества элементов списка
+     * @param list список объектов класса {@link Ad}
+     * @return список объявлений в выходном формате {@link AdsDtoOut} с элементами класса {@link AdDtoOut}.
+     */
     public AdsDtoOut toAdsDtoOut(List<Ad> list) {
         if (list==null) {list = Collections.EMPTY_LIST;} //для тестов и на всякий случай
         AdsDtoOut adsDtoOut = new AdsDtoOut();
