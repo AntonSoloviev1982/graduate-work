@@ -25,6 +25,11 @@ public class CommentMapper {
         this.adRepository = adRepository;
     }
 
+    /**
+     * Метод преобразует Dto {@link CreateOrUpdateComment} в объект класса {@link AdComment}.
+     * @param createOrUpdateComment Dto {@link CreateOrUpdateComment}.
+     * @return объект класса {@link AdComment}.
+     */
     public AdComment toEntity(CreateOrUpdateComment createOrUpdateComment, Integer adId, Integer userId){
         AdComment adComment = new AdComment();
         adComment.setText(createOrUpdateComment.getText());
@@ -34,6 +39,11 @@ public class CommentMapper {
         return adComment;
     }
 
+    /**
+     * Метод преобразует объект класса {@link AdComment} в Dto {@link Comment}.
+     * @param adComment объект класса {@link AdComment}.
+     * @return Dto {@link Comment}.
+     */
     public Comment toDto(AdComment adComment){
         Comment comment = new Comment();
         User user = adComment.getUser();
@@ -46,6 +56,11 @@ public class CommentMapper {
         return comment;
     }
 
+    /**
+     * Метод преобразует список объектов класса {@link AdComment} в Dto {@link Comments}.
+     * @param  list список объектов класса {@link AdComment}.
+     * @return Dto {@link Comments}.
+     */
     @Transactional
     public Comments toComments(List<AdComment> list) {
         int size = list.size();
