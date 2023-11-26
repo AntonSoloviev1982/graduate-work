@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,11 +24,9 @@ import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
-import ru.skypro.homework.service.CheckUserService;
 import ru.skypro.homework.service.CommentService;
 
 import javax.persistence.EntityNotFoundException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +56,6 @@ class CommentControllerTest {
     private CommentMapper commentMapper;
     @SpyBean
     private CommentService commentService;
-    //если roles = "ADMIN", то checkUserService не используется
-    //@SpyBean
-    //private CheckUserService checkUserService;
     @MockBean
     private AdService adService;
 
@@ -124,9 +118,7 @@ class CommentControllerTest {
         when(commentRepository.findAllByAdId(any(Integer.class))).thenReturn(List.of(adComment, otherComment));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/ads/3/comments")
-                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
-                                HttpHeaders.encodeBasicAuth("bbbb@mail.ru", "bbbb2222", StandardCharsets.UTF_8)))
+                .get("/ads/3/comments"))
                 .andExpect(status().isOk())
                 .andExpect( result -> {
                     jsonPath("$[0].author").value(1);
@@ -158,11 +150,9 @@ class CommentControllerTest {
 
         when(commentRepository.save(any(AdComment.class))).thenReturn(adComment);
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/ads/3/comments")
-                        .content(objectMapper.writeValueAsString(createOrUpdateComment))
-                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
-                                HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8))
-                        .contentType(MediaType.APPLICATION_JSON))
+                .post("/ads/3/comments")
+                .content(objectMapper.writeValueAsString(createOrUpdateComment))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect( result -> {
                     jsonPath("$.author").value(1);
@@ -192,11 +182,9 @@ class CommentControllerTest {
 
         when(commentRepository.save(any(AdComment.class))).thenReturn(adComment);
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/ads/3/comments")
-                        .content(objectMapper.writeValueAsString(createOrUpdateComment))
-                        .header(HttpHeaders.AUTHORIZATION, "Basic " +
-                                HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8))
-                        .contentType(MediaType.APPLICATION_JSON))
+                .post("/ads/3/comments")
+                .content(objectMapper.writeValueAsString(createOrUpdateComment))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect( result -> {
                     jsonPath("$.author").value(1);
@@ -224,9 +212,7 @@ class CommentControllerTest {
         when(commentRepository.findById(any(Integer.class))).thenReturn(Optional.of(adComment));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/ads/3/comments/777")
-                .header(HttpHeaders.AUTHORIZATION, "Basic " +
-                        HttpHeaders.encodeBasicAuth("aaaa@mail.ru", "aaaa1111", StandardCharsets.UTF_8)))
+                .delete("/ads/3/comments/777"))
                 .andExpect(status().isOk());
         verify(commentRepository, times(1)).delete(any(AdComment.class));
     }
